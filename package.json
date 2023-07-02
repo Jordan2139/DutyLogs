@@ -1,0 +1,32 @@
+{
+    "name": "bot",
+    "version": "1.0.0",
+    "description": "Discord Bot",
+    "main": "index.js",
+    "private": true,
+    "scripts": {
+        "start": "node --max-http-header-size 25000 index.js"
+    },
+    "author": "PlutoTheDev",
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^1.4.0",
+        "canvas": "^2.11.2",
+        "chalk": "^4.1.2",
+        "chart.js": "^4.3.0",
+        "cookie-parser": "^1.4.6",
+        "discord-html-transcripts": "^3.1.4",
+        "discord.js": "^14.11.0",
+        "express": "^4.18.2",
+        "express-mysql-session": "^3.0.0",
+        "express-session": "^1.17.3",
+        "fs": "^0.0.1-security",
+        "imgur-uploader": "^4.2.1",
+        "multer": "^1.4.5-lts.1",
+        "mysql": "^2.18.1",
+        "passport": "^0.6.0",
+        "passport-discord-faxes": "^0.1.6",
+        "path": "^0.12.7",
+        "string-table": "^0.1.5"
+    }
+}

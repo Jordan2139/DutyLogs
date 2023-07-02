@@ -1,0 +1,18 @@
+{
+    "bot_token": "",
+    "sql": {
+        "host": "localhost",
+        "user": "root",
+        "password": "",
+        "database": "fivemdutylogs"
+    },
+    "port": 3000,
+    "express": {
+        "domain": "http://localhost:3000",
+        "Oauth2ID": "",
+        "Oauth2Secret": ""
+    },
+    "color": 16151582,
+    "red": 14227761,
+    "err": "https://pluto.vodka/399718367335940117/DAF1PP.png"
+}
