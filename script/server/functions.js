@@ -105,7 +105,7 @@ on('OndutyLogs::OnDuty', async (department) => {
                 logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') has been added to the activeBlips array.')
                 emitNet('OndutyLogs::Callback', playerId, { duty: true, department: department }, null)
                 if (department.blips.enabled) {
-                    emit('OndutyLogs::CreateBlip', { src: source, blips: department.blips })
+                    emitNet('OndutyLogs::CreateBlip::Client', source, department.blips)
                 }
             }
         } else {
@@ -162,65 +162,9 @@ on('OndutyLogs::OffDuty', async (department) => {
         logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') has been removed from the ondutyPlayers array because they went off duty.')
         activeBlips = activeBlips.filter(player => player.id !== source);
         logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') has been removed from the activeBlips array because they went off duty.')
+        emitNet('OndutyLogs::RemoveBlip::Client', source)
     }
 })
-
-function ExtractIdentifiers(src) {
-    const identifiers = {
-        steam: "",
-        ip: "",
-        discord: "",
-        license: "",
-        xbl: "",
-        live: ""
-    }
-
-    for (let i = 0; i < GetNumPlayerIdentifiers(src); i++) {
-        const id = GetPlayerIdentifier(src, i)
-        if (id.includes("steam")) {
-            identifiers.steam = id
-        } else if (id.includes("ip")) {
-            identifiers.ip = id
-        } else if (id.includes("discord")) {
-            identifiers.discord = id
-        } else if (id.includes("license")) {
-            identifiers.license = id
-        } else if (id.includes("xbl")) {
-            identifiers.xbl = id
-        } else if (id.includes("live")) {
-            identifiers.live = id
-        }
-    }
-    logDebug('Extracted identifiers for client id: ' + src + ' (' + GetPlayerName(src) + '): ' + JSON.stringify(identifiers))
-    return identifiers
-}
-
-function logDebug(message) {
-    if (config.debugMode) {
-        console.log(`[DEBUG] ${message}`)
-    }
-}
-
-function logError(message) {
-    console.log(`[ERROR] ${message}`)
-}
-
-function customStringify(obj) {
-    const seen = new WeakSet(); // Keep track of visited objects
-
-    return JSON.stringify(obj, function (key, value) {
-        if (typeof value === 'object' && value !== null) {
-            if (seen.has(value)) {
-                return '[Circular Reference]';
-            }
-            seen.add(value);
-        }
-        return value;
-    });
-}
-
-const obj = { foo: 'bar' };
-obj.circularRef = obj; // Adding circular reference
 
 on('playerConnecting', (name, setKickReason, deferrals) => {
     const src = source;
@@ -314,27 +258,6 @@ on('playerDropped', async (reason) => {
     }
 })
 
-let blips = []
-RegisterNetEvent('OndutyLogs::CreateBlip')
-on('OndutyLogs::CreateBlip', function (src, data) {
-    blips.push(src)
-    emitNet('OndutyLogs::CreateBlip::Client', src, data)
-})
-
-RegisterNetEvent('OndutyLogs::RemoveBlip')
-on('OndutyLogs::RemoveBlip', function (src) {
-    blips = blips.filter(function (blip) {
-        return blip !== src
-    })
-    emitNet('OndutyLogs::RemoveBlip::Client', src)
-})
-
-on('playerDropped', function (reason) {
-    blips = blips.filter(function (blip) {
-        return blip !== source
-    })
-})
-
 Citizen.CreateThread(function () {
     let lastUpdated = Date.now()
     while (true) {
@@ -345,3 +268,61 @@ Citizen.CreateThread(function () {
         Wait(0)
     }
 })
+
+
+function ExtractIdentifiers(src) {
+    const identifiers = {
+        steam: "",
+        ip: "",
+        discord: "",
+        license: "",
+        xbl: "",
+        live: ""
+    }
+
+    for (let i = 0; i < GetNumPlayerIdentifiers(src); i++) {
+        const id = GetPlayerIdentifier(src, i)
+        if (id.includes("steam")) {
+            identifiers.steam = id
+        } else if (id.includes("ip")) {
+            identifiers.ip = id
+        } else if (id.includes("discord")) {
+            identifiers.discord = id
+        } else if (id.includes("license")) {
+            identifiers.license = id
+        } else if (id.includes("xbl")) {
+            identifiers.xbl = id
+        } else if (id.includes("live")) {
+            identifiers.live = id
+        }
+    }
+    logDebug('Extracted identifiers for client id: ' + src + ' (' + GetPlayerName(src) + '): ' + JSON.stringify(identifiers))
+    return identifiers
+}
+
+function logDebug(message) {
+    if (config.debugMode) {
+        console.log(`[DEBUG] ${message}`)
+    }
+}
+
+function logError(message) {
+    console.log(`[ERROR] ${message}`)
+}
+
+function customStringify(obj) {
+    const seen = new WeakSet(); // Keep track of visited objects
+
+    return JSON.stringify(obj, function (key, value) {
+        if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+                return '[Circular Reference]';
+            }
+            seen.add(value);
+        }
+        return value;
+    });
+}
+
+const obj = { foo: 'bar' };
+obj.circularRef = obj; // Adding circular reference
