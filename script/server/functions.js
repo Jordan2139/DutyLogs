@@ -259,6 +259,14 @@ on('playerDropped', async (reason) => {
         }
     }
 })
+
+RegisterNetEvent('OndutyLogs::CheckDuty')
+onNet('OndutyLogs::CheckDuty', async (department) => {
+    department.abbr = department.abbr.toUpperCase()
+    if (!config.departments[department.abbr].permissions.checkDuty) return;
+    emitNet('OndutyLogs::CheckDuty::Callback', source, activeBlips.filter(person => person.blips.type === department.blips.type))
+})
+
 setTick(async function () {
     while (true) {
         for (let i = 0; i < activeBlips.length; i++) {

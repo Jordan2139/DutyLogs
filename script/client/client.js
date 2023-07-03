@@ -14,6 +14,27 @@ RegisterCommand('duty', (_, args) => {
      }
 })
 
+RegisterCommand('checkduty', () => {
+     if (department) {
+          emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7You are currently ${onduty ? 'on' : 'off'} duty as ${department ? department.name : 'N/A'}`] })
+          emitNet('OndutyLogs::CheckDuty', department)
+     } else {
+          emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^1[ERROR] ^7You are not on duty.`] })
+     }
+})
+
+RegisterNetEvent('OndutyLogs::CheckDuty::Callback')
+onNet('OndutyLogs::CheckDuty::Callback', (status, error) => {
+     if (error) {
+          emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', '^1[ERROR] ^7' + error] })
+     } else {
+          emit('chat:addMessage', { color: [255, 0, 0], multiline: false, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7People on duty:`] })
+          status.forEach((person) => {
+               emit('chat:addMessage', { color: [255, 0, 0], multiline: false, args: [(`- ${person.playerName} - ${person.blips.label}`)] })
+          })
+     }
+})
+
 RegisterNetEvent('OndutyLogs::Callback')
 onNet('OndutyLogs::Callback', (status, error) => {
      if (error) {

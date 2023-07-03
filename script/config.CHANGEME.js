@@ -11,6 +11,7 @@ module.exports = {
             permissions: {
                 mode: 'ace', // Options: Ace = Ace Permissions, Discord = Discord Roles, Everyone = Everyone can use
                 allowedIdentifiers: ['group.lspd'], // Allowed Identifiers - Ace groups or Discord roles
+                checkDuty: true, // Allow this department to use the checkduty command
             },
             blips: {
                 enabled: true,
@@ -26,6 +27,7 @@ module.exports = {
             permissions: {
                 mode: 'ace', // Options: Ace = Ace Permissions, Discord = Discord Roles, Everyone = Everyone can use
                 allowedIdentifiers: ['group.bcso'], // Allowed Identifiers - Ace groups or Discord roles
+                checkDuty: true, // Allow this department to use the checkduty command
             },
             blips: {
                 enabled: true,
@@ -39,8 +41,9 @@ module.exports = {
         ['SAHP']: {
             properName: 'San Andreas Highway Patrol',
             permissions: {
-                mode: 'ace', // Options: Ace = Ace Permissions, Discord = Discord Roles, Everyone = Everyone can use
+                mode: 'everyone', // Options: Ace = Ace Permissions, Discord = Discord Roles, Everyone = Everyone can use
                 allowedIdentifiers: ['group.sahp'], // Allowed Identifiers - Ace groups or Discord roles
+                checkDuty: true, // Allow this department to use the checkduty command
             },
             blips: {
                 enabled: true,
@@ -56,6 +59,7 @@ module.exports = {
             permissions: {
                 mode: 'ace', // Options: Ace = Ace Permissions, Discord = Discord Roles, Everyone = Everyone can use
                 allowedIdentifiers: ['group.lscfd'], // Allowed Identifiers - Ace groups or Discord roles
+                checkDuty: true, // Allow this department to use the checkduty command
             },
             blips: {
                 enabled: true,
@@ -71,11 +75,12 @@ module.exports = {
             permissions: {
                 mode: 'everyone', // Options: Ace = Ace Permissions, Discord = Discord Roles, Everyone = Everyone can use
                 allowedIdentifiers: [], // Allowed Identifiers - Ace groups or Discord roles
+                checkDuty: true, // Allow this department to use the checkduty command
             },
             blips: {
-                enabled: false,
-                sprite: 60,
-                color: 38,
+                enabled: true,
+                sprite: 1,
+                color: 3,
                 scale: 0.8,
                 label: 'CIV',
                 type: 'civ'
@@ -86,6 +91,7 @@ module.exports = {
             permissions: {
                 mode: 'ace', // Options: Ace = Ace Permissions, Discord = Discord Roles, Everyone = Everyone can use
                 allowedIdentifiers: ['group.certciv'], // Allowed Identifiers - Ace groups or Discord roles
+                checkDuty: true, // Allow this department to use the checkduty command
             },
             blips: {
                 enabled: false,
