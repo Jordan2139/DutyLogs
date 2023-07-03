@@ -131,19 +131,3 @@ module.exports.run = function (client, interaction, data) {
         };
     });
 };
-
-
-async function string(res) {
-    let types = {
-        1: "Daily",
-        2: "Weekend only",
-        3: "Every other day",
-        4: "Custom"
-    };
-    let emojis = {
-        no: "<:cross:1108279767159033896>",
-        yes: "<:check:1108279753238130728>"
-    };
-    let string = `**Type**: ${types[res[0].type]}\n**Channel**: <#${res[0].channel}>\n**Patrol Start Time**: \`${res[0].time}\`\n**Pre Announce Time**: \`${res[0].preAnnounceTime}\`\n${res[0].type !== 4 ? "\n" : `**Days**:\n> **Sunday** - ${res[0].days.includes("sunday") ? emojis.yes : emojis.no}\n> **Monday** - ${res[0].days.includes("monday") ? emojis.yes : emojis.no}\n> **Tuesday** - ${res[0].days.includes("tuesday") ? emojis.yes : emojis.no}\n> **Wednesday** - ${res[0].days.includes("wednesday") ? emojis.yes : emojis.no}\n> **Thursday** - ${res[0].days.includes("thursday") ? emojis.yes : emojis.no}\n> **Friday** - ${res[0].days.includes("friday") ? emojis.yes : emojis.no}\n> **Saturday** - ${res[0].days.includes("saturday") ? emojis.yes : emojis.no}\n\n`}**Additional Info**: ${res[0]?.info ? res[0].info : "N/A"}`;
-    return string;
-};

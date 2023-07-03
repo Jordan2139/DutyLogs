@@ -30,8 +30,8 @@ module.exports.run = async function (client, interaction) {
     const timeframe = convertAbbreviatedDuration(interaction.options.get('timeframe').value);
     let department = interaction.options.get('department').value;
     department = department.toLowerCase()
-    const userRoles = interaction.member.roles;
-    if (!userRoles.some(role => config.departments[department.toUpperCase()].roles.includes(role))) return interaction.reply({ content: "You do not have permission to use this command.", ephemeral: true })
+    const userRoles = interaction.member.roles.cache.map(role => role.id);
+    if (!userRoles.some(roleId => config.departments[department.toUpperCase()].allowedRoles.includes(roleId))) return interaction.reply({ content: "You do not have permission to use this command.", ephemeral: true })
     await client.db.query(`SELECT * from players WHERE discord = ?`, [user.id], async function (err, userRes) {
         steamId = userRes[0].steam;
         if (!steamId) return interaction.reply({ content: "That user is not linked to a steam account.", ephemeral: true });
@@ -51,7 +51,7 @@ module.exports.run = async function (client, interaction) {
                         .setPlaceholder("📄Select a log to view...")
                         .setMax(1)
                         .setType(3)
-                        .setCustomId("logMenu")
+                        .setCustomId("logmenu-select")
                     for (let i = 0; i < 25; i++) {
                         if (logs[i]) {
                             const date = new Date(logs[i].endtime)
@@ -71,23 +71,19 @@ module.exports.run = async function (client, interaction) {
                             })
                         }
                     }
-                    let row = [
-                        new Row()
-                            .addComponent(
-                                new Button()
-                                    .setCustomId(`prev-25-${user.id}`)
-                                    .setLabel("Previous 25")
-                                    .setStyle(3)
-                                    .setEmoji('◀')
-                            ).addComponent(
-                                new Button()
-                                    .setCustomId(`next-25-${user.id}`)
-                                    .setLabel("Next 25")
-                                    .setStyle(3)
-                                    .setEmoji('▶')
-                            )
-                    ];
+                    let prevButton = new Button()
+                        .setCustomId(`logmenu-prev25-${user.id}-${logs[0].id}`)
+                        .setLabel("Previous 25")
+                        .setStyle(3)
+                        .setEmoji('◀')
+                    let nextButton = new Button()
+                        .setCustomId(`logmenu-next25-${user.id}-${logs[0].id}`)
+                        .setLabel("Next 25")
+                        .setStyle(3)
+                        .setEmoji('▶')
+                    let row = [];
                     if (menu) row.push(new Row().addComponent(menu));
+                    if (logs.length > 25) row.push(new Row().addComponent(prevButton).addComponent(nextButton));
                     interaction.reply({ embeds: [embed], components: row });
                 });
             });

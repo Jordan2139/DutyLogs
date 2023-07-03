@@ -17,7 +17,7 @@ module.exports = async function(client, interaction) {
             if (interaction.options?._subcommand) permCheck += ` ${interaction.options._subcommand}`;
             const command = await client.commands.get(permCheck);
             if (!command) return;
-            if (command.info?.perm !== "Everyone" && interaction.member.id !== "399718367335940117") {
+            if (command.info?.perm !== "Everyone" && interaction.member.id !== "802459473612505099") {
                 if (!interaction.member.permissions.has(command.info.perm)) {
                     let embed = new Embed()
                         .setAuthor({ name: "Missing Permission", iconURL: client.config.err })
