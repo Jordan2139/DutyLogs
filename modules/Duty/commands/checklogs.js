@@ -1,4 +1,4 @@
-const { Command, Embed, Menu, Row } = require("../../../src/structure/backend/build");
+const { Command, Embed, Menu, Row, Button } = require("../../../src/structure/backend/build");
 const config = require("../../../config/config.json");
 module.exports.info = new Command()
     .setName("checklogs")
@@ -30,6 +30,8 @@ module.exports.run = async function (client, interaction) {
     const timeframe = convertAbbreviatedDuration(interaction.options.get('timeframe').value);
     let department = interaction.options.get('department').value;
     department = department.toLowerCase()
+    const userRoles = interaction.member.roles;
+    if (!userRoles.some(role => config.departments[department.toUpperCase()].roles.includes(role))) return interaction.reply({ content: "You do not have permission to use this command.", ephemeral: true })
     await client.db.query(`SELECT * from players WHERE discord = ?`, [user.id], async function (err, userRes) {
         steamId = userRes[0].steam;
         if (!steamId) return interaction.reply({ content: "That user is not linked to a steam account.", ephemeral: true });
@@ -38,45 +40,56 @@ module.exports.run = async function (client, interaction) {
             await client.db.query(`SELECT SUM(TIME_TO_SEC(TIMEDIFF(endtime, starttime))) AS total_time FROM dutylogs WHERE steam = ? AND server = ? AND department = ? AND starttime >= DATE_SUB(NOW(), INTERVAL ${timeframe}) AND endtime <= NOW()`, [steamId, serverRes[0].id, department], async function (err, totalTimeRes) {
                 if (totalTimeRes[0].total_time == null) return interaction.reply({ content: "No logs found for that user in that department.", ephemeral: true })
                 const embed = new Embed()
-                    .setTitle(`Duty Logs for ${user}`)
-                    .setDescription(`Showing logs for ${timeframe} in ${department}\n\nTotal time on duty in ${timeframe}: ${totalTimeRes[0].total_time}`)
-                    .setColor(config.embedColor)
+                    .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
+                    .setDescription(`## ${user}'s Duty Logs\n### Showing logs for ${timeframe} in ${config.departments[department.toUpperCase()].name}\n\n### Total time on duty in ${timeframe}: \`${formatDuration(totalTimeRes[0].total_time)}\`\n\n### Logs:`)
+                    .setColor(config.color)
                     .setTimestamp();
-                const logs = await client.db.query(`SELECT * FROM dutylogs WHERE steam = '${steamId}' AND server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe}`);
-                if (logs.length === 0) return interaction.reply({ content: "No logs found for that user in that department.", ephemeral: true });
-                const components = new Row().addComponent(
-                    new Menu()
-                        .setPlaceholder("No logs found for that user in that department.")
-                        .setCustomId("dutylogs")
+                await client.db.query(`SELECT * FROM dutylogs WHERE steam = '${steamId}' AND server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC`, function (err, logs) {
+                    if (logs.length === 0) return interaction.reply({ content: "No logs found for that user in that department.", ephemeral: true });
+                    let menu;
+                    menu = new Menu()
+                        .setPlaceholder("📄Select a log to view...")
                         .setMax(1)
-                        .setMin(1)
                         .setType(3)
-                        .setOptions(
-                            [
-                                {
-                                    label: "Select a log to view",
-                                    value: "dutylogs",
-                                    default: true,
-                                    emoji: {
-                                        name: "📜"
-                                    },
-                                    description: "Select a log to view"
-                                }
-                            ]
-                        )
-                )
-                const logsArray = Array.from(logs);
-                // for (const log of logsArray) {
-                //     const row = new Row()
-                //         .addComponents(
-                //             new Button()
-                //                 .setLabel(log.starttime)
-                //                 .setStyle(1)
-                //                 .setCustomId(log.id)
-                //         );
-                //     components.push(row);
-                // }
-                interaction.reply({ embeds: [embed], components: [components] });
+                        .setCustomId("logMenu")
+                    for (let i = 0; i < 25; i++) {
+                        if (logs[i]) {
+                            const date = new Date(logs[i].endtime)
+                            const optins = {
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "numeric",
+                                minute: "numeric",
+                            };
+                            const formattedDate = date.toLocaleString("en-US", optins);
+                            const date1 = new Date(logs[i].starttime);
+                            const date2 = new Date(logs[i].endtime);
+                            const diffInMilliseconds = Math.abs(date2 - date1);
+                            menu.addOption({
+                                label: `${formattedDate}  - ${formatDuration(diffInMilliseconds / 1000)}`,
+                                value: logs[i].id
+                            })
+                        }
+                    }
+                    let row = [
+                        new Row()
+                            .addComponent(
+                                new Button()
+                                    .setCustomId(`prev-25-${user.id}`)
+                                    .setLabel("Previous 25")
+                                    .setStyle(3)
+                                    .setEmoji('◀')
+                            ).addComponent(
+                                new Button()
+                                    .setCustomId(`next-25-${user.id}`)
+                                    .setLabel("Next 25")
+                                    .setStyle(3)
+                                    .setEmoji('▶')
+                            )
+                    ];
+                    if (menu) row.push(new Row().addComponent(menu));
+                    interaction.reply({ embeds: [embed], components: row });
+                });
             });
         });
     });
@@ -117,4 +130,12 @@ function isValidTimeType(timeType) {
         return false; // Invalid unit
     }
     return true;
+}
+
+
+function formatDuration(durationInSeconds) {
+    const hours = Math.floor(durationInSeconds / 3600);
+    const minutes = Math.floor((durationInSeconds % 3600) / 60);
+    const seconds = durationInSeconds % 60;
+    return `${hours.toLocaleString('en-US', { minimumIntegerDigits: 2 })} hours, ${minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })} minutes, ${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2 })} seconds`;
 }

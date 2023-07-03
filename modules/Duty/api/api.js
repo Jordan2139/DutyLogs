@@ -187,28 +187,6 @@ function formatDuration(durationInSeconds) {
     return `${hours.toLocaleString('en-US', { minimumIntegerDigits: 2 })} hours, ${minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })} minutes, ${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2 })} seconds`;
 }
 
-function calculateTotalTimeOnDuty(dutyLogs) {
-    let totalTime = 0; // Total time on duty in seconds
-    let onDutyStartTime = null;
-
-    for (let i = 0; i < dutyLogs.length; i++) {
-        const log = dutyLogs[i];
-
-        if (log.starttime && !log.endtime) {
-            // On-duty log
-            onDutyStartTime = new Date(log.starttime);
-        } else if (!log.starttime && log.endtime && onDutyStartTime) {
-            // Off-duty log
-            const offDutyEndTime = log.endtime !== 'null' ? new Date(log.endtime) : new Date(); // Current time if endtime is null
-            const timeDiff = Math.floor((offDutyEndTime - onDutyStartTime) / 1000); // Convert milliseconds to seconds
-            totalTime += timeDiff;
-            onDutyStartTime = null; // Reset on-duty start time
-        }
-    }
-
-    return totalTime;
-}
-
 
 function compareObjs(object) {
     if (object.length < 2) {

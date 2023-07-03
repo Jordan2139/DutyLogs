@@ -5,11 +5,11 @@ let shouldShowBlips = false;
 
 RegisterCommand('duty', (_, args) => {
      if (!args[0]) return emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', '^1[ERROR] ^7You must specify a department.'] })
-     if (onduty && department === args[0].toUpperCase()) {
+     if (onduty && department.abbr.toUpperCase() === args[0].toUpperCase()) {
           emitNet('OndutyLogs::OffDuty', args[0])
      } else if (!onduty) {
           emitNet('OndutyLogs::OnDuty', args[0])
-     } else if (onduty && department !== args[0].toUpperCase()) {
+     } else if (onduty && department.abbr.toUpperCase() !== args[0].toUpperCase()) {
           emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^1[ERROR] ^7You are already on duty as ${department}, you must go off duty as that first, then you may go on duty as ${args[0]}.`] })
      }
 })
@@ -65,19 +65,22 @@ function CleanUpBlips() {
 
 function RefreshBlips(activeBlips) {
      let myServerId = GetPlayerServerId(PlayerId());
-     for (src, data in activeBlips) {
-          if (src !== myServerId) {
-               if (data && data.coords && data.type == department.blips.type && data.enabled) {
-                    let blip = AddBlipForCoord(data.coords.x, data.coords.y, data.coords.z);
-                    SetBlipSprite(blip, data.sprite);
-                    SetBlipDisplay(blip, 4);
-                    SetBlipScale(blip, data.scale);
-                    SetBlipColour(blip, data.color);
-                    SetBlipAsShortRange(blip, true);
-                    BeginTextCommandSetBlipName("STRING");
-                    AddTextComponentString(data.name);
-                    EndTextCommandSetBlipName(blip);
-                    blips.push(blip);
+     for (const src in activeBlips) {
+          if (activeBlips.hasOwnProperty(src)) {
+               const data = activeBlips[src];
+               if (data.id !== myServerId) {
+                    if (data && data.coords && data.blips.type.toLowerCase() == department.blips.type.toLowerCase() && data.blips.enabled) {
+                         let blip = AddBlipForCoord(data.coords[0], data.coords[1], data.coords[2]);
+                         SetBlipSprite(blip, data.blips.sprite);
+                         SetBlipDisplay(blip, 4);
+                         SetBlipColour(blip, data.blips.color);
+                         SetBlipAsShortRange(blip, true);
+                         SetBlipShowCone(blip, true);
+                         BeginTextCommandSetBlipName("STRING");
+                         AddTextComponentString(data.playerName + ' - ' + data.blips.label);
+                         EndTextCommandSetBlipName(blip);
+                         blips.push(blip);
+                    }
                }
           }
      }

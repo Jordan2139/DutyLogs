@@ -99,23 +99,23 @@ on('OndutyLogs::OnDuty', async (department) => {
                 checkres = customStringify(checkres)
                 logDebug('checkres: ' + JSON.stringify(checkres))
                 department = { name: config.departments[department].properName, abbr: department, blips: config.departments[department].blips }
-                ondutyPlayers.push({ id: source, department: department.abbr })
-                logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') has been added to the ondutyPlayers array.')
-                activeBlips.push({ id: source, blips: department.blips })
-                logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') has been added to the activeBlips array.')
                 emitNet('OndutyLogs::Callback', playerId, { duty: true, department: department }, null)
                 if (department.blips.enabled) {
-                    emitNet('OndutyLogs::CreateBlip::Client', source, department.blips)
+                    ondutyPlayers.push({ id: playerId, department: department.abbr })
+                    logDebug('Client id: ' + playerId + ' (' + GetPlayerName(playerId) + ') has been added to the ondutyPlayers array.')
+                    activeBlips.push({ id: playerId, blips: department.blips, playerName: GetPlayerName(playerId) })
+                    logDebug('Client id: ' + playerId + ' (' + GetPlayerName(playerId) + ') has been added to the activeBlips array.')
+                    emitNet('OndutyLogs::CreateBlip::Client', playerId, department.blips)
                 }
             }
         } else {
             emitNet('OndutyLogs::Callback', playerId, { duty: false, department: null }, 'You do not have permission to go on duty as this department.')
-            logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') does not have permission to go on duty as department: ' + department)
+            logDebug('Client id: ' + playerId + ' (' + GetPlayerName(playerId) + ') does not have permission to go on duty as department: ' + department)
         }
     } else {
         const departmentKeys = Object.keys(config.departments);
         emitNet('OndutyLogs::Callback', playerId, { duty: false, department: null }, 'You specified an invalid department.\nValid departments: ' + departmentKeys.join(', '))
-        logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') specified an invalid department: ' + department)
+        logDebug('Client id: ' + playerId + ' (' + GetPlayerName(playerId) + ') specified an invalid department: ' + department)
     }
 })
 
@@ -158,11 +158,13 @@ on('OndutyLogs::OffDuty', async (department) => {
         logDebug('checkres: ' + JSON.stringify(checkres))
         department = { name: config.departments[department].properName, abbr: department, blips: config.departments[department].blips }
         emitNet('OndutyLogs::Callback', playerId, { duty: false, department: department }, null)
-        ondutyPlayers = ondutyPlayers.filter(player => player.id !== source);
-        logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') has been removed from the ondutyPlayers array because they went off duty.')
-        activeBlips = activeBlips.filter(player => player.id !== source);
-        logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') has been removed from the activeBlips array because they went off duty.')
-        emitNet('OndutyLogs::RemoveBlip::Client', source)
+        if (department.blips.enabled) {
+            ondutyPlayers = ondutyPlayers.filter(player => player.id !== playerId);
+            logDebug('Client id: ' + playerId + ' (' + GetPlayerName(playerId) + ') has been removed from the ondutyPlayers array because they went off duty.')
+            activeBlips = activeBlips.filter(player => player.id !== playerId);
+            logDebug('Client id: ' + playerId + ' (' + GetPlayerName(playerId) + ') has been removed from the activeBlips array because they went off duty.')
+            emitNet('OndutyLogs::RemoveBlip::Client', playerId)
+        }
     }
 })
 
@@ -257,18 +259,15 @@ on('playerDropped', async (reason) => {
         }
     }
 })
-
-Citizen.CreateThread(function () {
-    let lastUpdated = Date.now()
+setTick(async function () {
     while (true) {
-        if (Date.now() - lastUpdated > 3000) {
-            lastUpdated = Date.now()
-            emitNet('OndutyLogs::UpdateBlips::Client', blips)
+        for (let i = 0; i < activeBlips.length; i++) {
+            activeBlips[i].coords = GetEntityCoords(GetPlayerPed(activeBlips[i].id))
         }
-        Wait(0)
+        emitNet('OndutyLogs::UpdateBlips::Client', -1, activeBlips)
+        await Wait(500)
     }
 })
-
 
 function ExtractIdentifiers(src) {
     const identifiers = {
@@ -326,3 +325,7 @@ function customStringify(obj) {
 
 const obj = { foo: 'bar' };
 obj.circularRef = obj; // Adding circular reference
+
+function Wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
