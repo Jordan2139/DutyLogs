@@ -51,7 +51,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}
+          tag_name: release-${{ github.run_number }}-${{ github.run_id }}
           release_name: Release ${{ github.ref }}
           body: Automated release
           draft: false
