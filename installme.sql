@@ -13,14 +13,6 @@ CREATE TABLE IF NOT EXISTS `dutylogs` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=MyISAM AUTO_INCREMENT=217 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci ROW_FORMAT=DYNAMIC;
 
-CREATE TABLE IF NOT EXISTS `errors` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `err` longtext COLLATE utf8mb4_unicode_520_ci,
-  `guild` text COLLATE utf8mb4_unicode_520_ci,
-  `interaction` text COLLATE utf8mb4_unicode_520_ci,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
 CREATE TABLE IF NOT EXISTS `logchannels` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `guild` text COLLATE utf8mb4_unicode_520_ci,
