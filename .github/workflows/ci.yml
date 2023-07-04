@@ -1,0 +1,29 @@
+on: [push]
+jobs:
+  upload_to_sftp:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Zip Folder
+        uses: vimtor/action-zip@v1
+        with:
+          files: /script
+          recursive: true
+          dest: DutyLogs-Script.zip
+      - uses: actions/upload-artifact@v1
+        with:
+          name: DutyLogs-Script.zip
+          path: ${{ github.workspace }}/DutyLogs-Script.zip
+      - run: rm -r script; rm -rf .gitignore; rm -rf .gitattributes
+      - name: Zip Folder
+        uses: vimtor/action-zip@v1
+        with:
+          files: /
+          recursive: true
+          dest: DutyLogs-Bot.zip
+      - uses: actions/upload-artifact@v1
+        with:
+          name: DutyLogs-Bot.zip
+          path: ${{ github.workspace }}/DutyLogs-Bot.zip
