@@ -12,14 +12,15 @@
      * blips is used to update the blips when the player changes the department they are on duty as.
      * shouldShowBlips is used to check if the blips should be shown or not.
      * showDutyCount is used to check if the duty count should be shown or not.
-     * showDutyCountEnabled is used to check if the duty count is enabled or not in the config.
+     * dutyCountConfig is used to check if the duty count is enabled or not in the config.
 */
 let onduty = false;
 let department = null;
 let blips = [];
 let shouldShowBlips = false;
 let showDutyCount = true;
-let showDutyCountEnabled = nil;
+let dutyCountConfig = {};
+let serverBlips = [];
 
 /*
      * Registering Commands and Suggestions
@@ -51,7 +52,7 @@ RegisterCommand('checkduty', () => {
      }
 })
 
-if (showDutyCountEnabled) {
+if (dutyCountConfig) {
      RegisterCommand('dutycount', () => {
           showDutyCount = !showDutyCount;
           emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7Duty count is now ${showDutyCount ? 'enabled' : 'disabled'}`] })
@@ -88,7 +89,7 @@ onNet('OndutyLogs::CheckDuty::Callback', (status, error) => {
 
 RegisterNetEvent('OndutyLogs::getConfig::Callback')
 onNet('OndutyLogs::getConfig::Callback', (config) => {
-     showDutyCountEnabled = config;
+     dutyCountConfig = config;
 })
 
 RegisterNetEvent('OndutyLogs::Callback')
@@ -122,11 +123,30 @@ on('OndutyLogs::RemoveBlip::Client', function (src) {
 
 RegisterNetEvent('OndutyLogs::UpdateBlips::Client')
 on('OndutyLogs::UpdateBlips::Client', function (activeBlips) {
+     serverBlips = activeBlips;
      if (shouldShowBlips) {
           CleanUpBlips()
           RefreshBlips(activeBlips)
      }
 })
+
+if (dutyCountConfig.enabled && showDutyCount) {
+     setTick(async () => {
+          let pos = dutyCountConfig.display.pos;
+          let text1 = `On Duty: ${department ? department.name : 'N/A'}`;
+          let text2 = ``
+          while (showDutyCount) {
+               SetTextScale(0.35, 0.35);
+               SetTextFont(4);
+               SetTextProportional(1);
+               SetTextOutline();
+               BeginTextCommandDisplayText("STRING");
+               AddTextComponentSubstringPlayerName(text1);
+               EndTextCommandDisplayText(pos.x, pos.y);
+          }
+          await Wait(dutyCountConfig.interval);
+     })
+}
 
 /*
      * Functions
@@ -182,4 +202,23 @@ function RefreshBlips(activeBlips) {
                }
           }
      }
+}
+
+/**
+ * @param {number} ms
+ * @description Wait for a specified amount of time.
+ * @example
+ * await Wait(5000)
+ * // Waits 5 seconds
+ * console.log('5 seconds have passed.')
+ * // 5 seconds have passed.
+ * @returns {Promise}
+ * @example
+ * Wait(5000).then(() => {
+ *     console.log('5 seconds have passed.')
+ *    // 5 seconds have passed.
+ * })
+ */
+function Wait(ms) {
+     return new Promise(resolve => setTimeout(resolve, ms));
 }

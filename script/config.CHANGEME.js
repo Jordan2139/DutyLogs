@@ -5,7 +5,17 @@ module.exports = {
         dutylogsbotip: '', // IP of the duty logs bot
         dutylogsbotport: '', // Port of the duty logs bot
     },
-    showOnDutyCount: true, // Show the onduty stats on screen
+    dutyCount: {
+        enabled: true, // Enable the duty count
+        interval: 3000, // How often to update the duty count (in ms)
+        groupBy: 'department', // Options: department, blipType
+        display: {
+            pos: {
+                x: 0.005,
+                y: 0.005
+            }
+        }
+    },
     departments: {
         ['LSPD']: {
             properName: 'Los Santos Police Department',
