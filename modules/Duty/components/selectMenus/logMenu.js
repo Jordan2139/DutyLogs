@@ -15,7 +15,7 @@ module.exports.run = function (client, interaction, data) {
                     new Row()
                         .addComponent(
                             new Button()
-                                .setCustomId(`logmenu-goback`)
+                                .setCustomId(`logmenu-goback-${interaction.member.id}`)
                                 .setLabel("Back")
                                 .setStyle(3)
                                 .setEmoji('🔙')

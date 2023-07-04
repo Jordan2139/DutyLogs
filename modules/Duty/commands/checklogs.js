@@ -87,6 +87,11 @@ module.exports.run = async function (client, interaction) {
                     interaction.reply({ embeds: [embed], components: row });
                 });
             });
+            client.cache[interaction.member.id] = {
+                user: user,
+                timeframe: timeframe,
+                department: department
+            };
         });
     });
 };
