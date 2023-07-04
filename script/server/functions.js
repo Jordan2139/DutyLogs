@@ -1,10 +1,35 @@
+/*
+     * This is the main client script for the Duty Logs resource.
+     * This script handles the client-side commands and blips.
+*/
+
+/*
+    * Variables
+    * axios is used to make requests to the DutyLogs API.
+    * ondutyPlayers is used to store the players that are on duty.
+    * activeBlips is used to store the blips that are created.
+    * activeBlips is used to remove the blips when the player goes off duty.
+    * activeBlips is used to update the blips when the player changes the department they are on duty as.
+    * obj is used to store the object that is used to stringify the axios response.
+*/
 const axios = require('axios')
 axios.defaults.timeout = 30000;
 axios.defaults.httpsAgent = new https.Agent({ keepAlive: true });
 const config = require('./config.js');
 let ondutyPlayers = [];
 activeBlips = [];
+const obj = { foo: 'bar' };
+obj.circularRef = obj; // Adding circular reference
 
+
+/*
+    * Events
+    * OndutyLogs::OnDuty is triggered when a player goes on duty.
+    * OndutyLogs::OffDuty is triggered when a player goes off duty.
+    * playerConnecting is triggered when a player connects to the server.
+    * playerDropped is triggered when a player disconnects from the server.
+    * OndutyLogs::CheckDuty is triggered when a player uses the /checkduty command.
+*/
 RegisterNetEvent('OndutyLogs::OnDuty')
 on('OndutyLogs::OnDuty', async (department) => {
     const playerId = source
@@ -213,6 +238,7 @@ on('playerConnecting', (name, setKickReason, deferrals) => {
         checkres = customStringify(checkres)
         logDebug('checkres: ' + JSON.stringify(checkres))
     }
+    emitNet('OndutyLogs::getConfig::Client', src, config.showOnDutyCount)
 })
 
 on('playerDropped', async (reason) => {
@@ -267,6 +293,11 @@ onNet('OndutyLogs::CheckDuty', async (department) => {
     emitNet('OndutyLogs::CheckDuty::Callback', source, activeBlips.filter(person => person.blips.type === department.blips.type))
 })
 
+/*
+    * Threads (Ticks)
+    * This thread is used to update the blips every 500ms.
+    * This thread is used to update the ondutyPlayers array every 500ms.
+*/
 setTick(async function () {
     while (true) {
         for (let i = 0; i < activeBlips.length; i++) {
@@ -277,6 +308,20 @@ setTick(async function () {
     }
 })
 
+/*
+    * Functions
+    * ExtractIdentifiers is used to extract the identifiers from a player.
+    * logDebug is used to log debug messages to the console.
+    * logError is used to log error messages to the console.
+    * customStringify is used to stringify an object without circular references.
+    * Wait is used to wait for a specified amount of time.
+*/
+
+/**
+ *
+ * @param {user} src
+ * @returns {identifiers}
+ */
 function ExtractIdentifiers(src) {
     const identifiers = {
         steam: "",
@@ -286,7 +331,6 @@ function ExtractIdentifiers(src) {
         xbl: "",
         live: ""
     }
-
     for (let i = 0; i < GetNumPlayerIdentifiers(src); i++) {
         const id = GetPlayerIdentifier(src, i)
         if (id.includes("steam")) {
@@ -307,19 +351,44 @@ function ExtractIdentifiers(src) {
     return identifiers
 }
 
+/**
+ *
+ * @param {string} message
+ * @description Log debug messages to the console.
+ * @example
+ * logDebug('This is a debug message.')
+ * // [DEBUG] This is a debug message.
+ */
 function logDebug(message) {
     if (config.debugMode) {
         console.log(`[DEBUG] ${message}`)
     }
 }
 
+/**
+ *
+ * @param {string} message
+ * @description Log error messages to the console.
+ * @example
+ * logError('This is an error message.')
+ * // [ERROR] This is an error message.
+ */
 function logError(message) {
     console.log(`[ERROR] ${message}`)
 }
 
+/**
+ * @param {object} obj
+ * @returns {string}
+ * @description Stringify an object without circular references.
+ * @example
+ * const obj = { foo: 'bar' };
+ * obj.circularRef = obj; // Adding circular reference
+ * console.log(customStringify(obj));
+ * // {"foo":"bar","circularRef":"[Circular Reference]"}
+ */
 function customStringify(obj) {
     const seen = new WeakSet(); // Keep track of visited objects
-
     return JSON.stringify(obj, function (key, value) {
         if (typeof value === 'object' && value !== null) {
             if (seen.has(value)) {
@@ -331,9 +400,21 @@ function customStringify(obj) {
     });
 }
 
-const obj = { foo: 'bar' };
-obj.circularRef = obj; // Adding circular reference
-
+/**
+ * @param {number} ms
+ * @description Wait for a specified amount of time.
+ * @example
+ * await Wait(5000)
+ * // Waits 5 seconds
+ * console.log('5 seconds have passed.')
+ * // 5 seconds have passed.
+ * @returns {Promise}
+ * @example
+ * Wait(5000).then(() => {
+ *     console.log('5 seconds have passed.')
+ *    // 5 seconds have passed.
+ * })
+ */
 function Wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

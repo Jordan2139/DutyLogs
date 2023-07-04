@@ -96,6 +96,14 @@ module.exports.run = async function (client, interaction) {
     });
 };
 
+// Functions
+/**
+ *
+ * @param {string} duration
+ * @returns {string}
+ * @example convertAbbreviatedDuration('1d') // '1 DAY'
+ * @example convertAbbreviatedDuration('1M') // '1 MONTHS'
+ */
 function convertAbbreviatedDuration(duration) {
     const mappings = {
         s: 'SECONDS',
@@ -120,6 +128,12 @@ function convertAbbreviatedDuration(duration) {
     return numericValue + ' ' + expandedUnit;
 }
 
+/**
+ * @param {string} timeType
+ * @returns {boolean}
+ * @example isValidTimeType('1d') // true
+ * @example isValidTimeType('1x') // false
+*/
 function isValidTimeType(timeType) {
     const regex = /^\d+[smhdwMy]$/;
     const validUnits = ['s', 'm', 'h', 'd', 'w', 'M', 'y'];
@@ -133,7 +147,11 @@ function isValidTimeType(timeType) {
     return true;
 }
 
-
+/**
+ * @param {number} durationInSeconds
+ * @returns {string}
+ * @example formatDuration(3600) // '01 hours, 00 minutes, 00 seconds'
+ */
 function formatDuration(durationInSeconds) {
     const hours = Math.floor(durationInSeconds / 3600);
     const minutes = Math.floor((durationInSeconds % 3600) / 60);

@@ -2,7 +2,7 @@ const { Embed } = require("../structure/backend/build")
 const axios = require("axios");
 module.exports = async function(client, interaction, err) {
     let embed = new Embed()
-        .setColor(client.config.red)
+        .setColor(client.config.color)
         .setAuthor({ name: "An error occurred", iconURL: client.config.err })
         .setDescription(`\`\`\`\n${err}\n\`\`\``)
     interaction.reply({ embeds: [embed], ephemeral: true });

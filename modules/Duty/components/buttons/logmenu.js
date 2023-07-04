@@ -172,6 +172,13 @@ module.exports.run = function (client, interaction, data) {
     };
 };
 
+/**
+ *
+ * @param {number} durationInSeconds
+ * @returns {string}
+ * @description Formats a duration in seconds to a human readable format.
+ * @example formatDuration(3600) // 01 hours, 00 minutes, 00 seconds
+ */
 function formatDuration(durationInSeconds) {
     const hours = Math.floor(durationInSeconds / 3600);
     const minutes = Math.floor((durationInSeconds % 3600) / 60);

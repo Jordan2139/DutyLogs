@@ -27,6 +27,14 @@ module.exports.run = function (client, interaction, data) {
     };
 };
 
+// Functions
+/**
+ *
+ * @param {number} durationInSeconds
+ * @returns {string}
+ * @description Formats a duration in seconds to a human readable format.
+ * @example formatDuration(3600) // 01 hours, 00 minutes, 00 seconds
+ */
 function formatDuration(durationInSeconds) {
     const hours = Math.floor(durationInSeconds / 3600);
     const minutes = Math.floor((durationInSeconds % 3600) / 60);
@@ -34,6 +42,13 @@ function formatDuration(durationInSeconds) {
     return `${hours.toLocaleString('en-US', { minimumIntegerDigits: 2 })} hours, ${minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })} minutes, ${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2 })} seconds`;
 }
 
+/**
+ *
+ * @param {dateObject} date
+ * @returns {string}
+ * @description Formats a date object to a human readable format.
+ * @example formatDate(new Date()) // 01/01/2021, 12:00 AM
+ */
 function formatDate(date) {
     const options = {
         month: "2-digit",

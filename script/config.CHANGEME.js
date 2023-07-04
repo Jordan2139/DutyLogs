@@ -5,6 +5,7 @@ module.exports = {
         dutylogsbotip: '', // IP of the duty logs bot
         dutylogsbotport: '', // Port of the duty logs bot
     },
+    showOnDutyCount: true, // Show the onduty stats on screen
     departments: {
         ['LSPD']: {
             properName: 'Los Santos Police Department',

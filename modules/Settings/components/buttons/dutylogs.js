@@ -125,7 +125,6 @@ module.exports.run = function (client, interaction, data) {
                 if (departmentButtonRow3.data.components.length > 0) components.push(departmentButtonRow3);
                 interaction.update({
                     content: "Lets first start with which department you would like to configure logs for!\nYou have access to the below departments:", components: components
-
                 });
                 break;
         };

@@ -1,3 +1,21 @@
+/*
+    This file handles all API requests coming from the FiveM Script counterpart
+    This file is not meant to be edited unless you know what you are doing
+*/
+
+/*
+    Variables
+    express is used to create the API
+    session is used to create a session for the API
+    bodyParser is used to parse the body of the request
+    cookieParser is used to parse the cookies of the request
+    multer is used to parse the files of the request
+    app is used to create the API
+    config is used to get the config
+    utils is used to create the table for the logs
+    chalk is used to color the console
+    Embed is used to create the embeds
+*/
 const express = require("express");
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -10,6 +28,10 @@ const chalk = require("chalk");
 const { Embed } = require("../../../src/structure/backend/build");
 
 module.exports = function (client) {
+    /*
+        This is the main function of the API
+        This function is used to create the API and start it
+    */
     var multerStorage = multer.memoryStorage()
     app.use(multer({ storage: multerStorage }).any());
     app.use(express.static('public'));
@@ -22,12 +44,27 @@ module.exports = function (client) {
         cookie: { maxAge: 253402300000000 },
     }));
     app.use(cookieParser());
-
     const server = app.listen(config.api.port, config.api.listenAddress, function () {
         const { address, port } = server.address();
         console.log(chalk.bold.green("[ SUCCESS ]") + `: API Online under address: http://${address}:${port}`);
     });
 
+    /*
+        * This is the handling for the /onduty endpoint
+        * This endpoint is used to set a player to on duty
+        * This endpoint requires a secret key to be used
+        * This endpoint requires the following query parameters:
+        * player: The player's name
+        * steam: The player's steam name
+        * discord: The player's discord ID
+        * status: The status of the player (true/false)
+        * department: The department the player is going on duty as
+        * This endpoint returns a message saying the request was received
+        * This endpoint also logs the request to the console
+        * This endpoint also logs the request to the database
+        * This endpoint also sends a message to the log channel
+        * This endpoint also sends a message to the duty logs channel
+    */
     app.post(`/onduty`, function (req, res) {
         const serverIp = req.ip
         const player = req.query.player
@@ -84,6 +121,23 @@ module.exports = function (client) {
         }
     });
 
+    /*
+        * This is the handling for the /offduty endpoint
+        * This endpoint is used to set a player to off duty
+        * This endpoint requires a secret key to be used
+        * This endpoint requires the following query parameters:
+        * player: The player's name
+        * steam: The player's steam name
+        * discord: The player's discord ID
+        * status: The status of the player (true/false)
+        * department: The department the player is going off duty as
+        * This endpoint returns a message saying the request was received
+        * This endpoint also logs the request to the console
+        * This endpoint also logs the request to the database
+        * This endpoint also sends a message to the log channel
+        * This endpoint also sends a message to the duty logs channel
+    */
+
     app.post(`/offduty`, function (req, res) {
         const serverIp = req.ip
         const player = req.query.player
@@ -125,6 +179,17 @@ module.exports = function (client) {
         }
     });
 
+    /*
+        * This is the handling for the /playerconnect endpoint
+        * This endpoint is used to log a player connecting to the server
+        * This endpoint requires a secret key to be used
+        * This endpoint requires the following query parameters:
+        * player: The player's name
+        * identifiers: The player's identifiers
+        * This endpoint returns a message saying the request was received
+        * This endpoint also logs the request to the console
+        * This endpoint also logs the request to the database
+    */
     app.post('/playerconnect', function (req, res) {
         const serverIp = req.ip
         const player = JSON.parse(req.query.player)
@@ -179,6 +244,14 @@ module.exports = function (client) {
     })
 }
 
+
+/**
+ *
+ * @param {number} durationInSeconds
+ * @returns {string}
+ * @description Formats a duration in seconds to a human readable format
+ * @example formatDuration(3600) // 01 hours, 00 minutes, 00 seconds
+ */
 function formatDuration(durationInSeconds) {
     const hours = Math.floor(durationInSeconds / 3600);
     const minutes = Math.floor((durationInSeconds % 3600) / 60);
@@ -187,7 +260,14 @@ function formatDuration(durationInSeconds) {
     return `${hours.toLocaleString('en-US', { minimumIntegerDigits: 2 })} hours, ${minutes.toLocaleString('en-US', { minimumIntegerDigits: 2 })} minutes, ${seconds.toLocaleString('en-US', { minimumIntegerDigits: 2 })} seconds`;
 }
 
-
+/**
+ *
+ * @param {object} object
+ * @returns {boolean}
+ * @description Compares two objects and returns true if they are different
+ * @example compareObjs({name: 'Jordan'}, {name: 'Jordan'}) // false
+ * @example compareObjs({name: 'Jordan'}, {name: 'Jordan', age: 19}) // true
+ */
 function compareObjs(object) {
     if (object.length < 2) {
         return false;
