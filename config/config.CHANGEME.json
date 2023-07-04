@@ -6,7 +6,11 @@
         "password": "",
         "database": "fivemdutylogs"
     },
-    "port": 3000,
+    "api": {
+        "port": 9696,
+        "listenAddress": "127.0.0.1",
+        "secretkey": "ilikeass"
+    },
     "express": {
         "domain": "http://localhost:3000",
         "Oauth2ID": "",
@@ -14,5 +18,80 @@
     },
     "color": 16151582,
     "red": 14227761,
-    "err": "https://pluto.vodka/399718367335940117/DAF1PP.png"
+    "err": "",
+    "deafultTime": "7d",
+    "departments": {
+        "LSPD": {
+            "name": "Los Santos Police Department",
+            "allowedRoles": [
+                "1013262282748346400"
+            ]
+        },
+        "BCSO": {
+            "name": "Blaine County Sheriff's Office",
+            "allowedRoles": [
+                "1013262282748346400"
+            ]
+        },
+        "SAHP": {
+            "name": "San Andreas Highway Patrol",
+            "allowedRoles": [
+                "1013262282748346400"
+            ]
+        },
+        "LSCFD": {
+            "name": "Los Santos County Fire Department",
+            "allowedRoles": [
+                "1013262282748346400"
+            ]
+        },
+        "CIV": {
+            "name": "Civilian",
+            "allowedRoles": [
+                "1013262282748346400"
+            ]
+        },
+        "CC": {
+            "name": "Certified Civilian",
+            "allowedRoles": [
+                "1013262282748346400"
+            ]
+        },
+        "admin": {
+            "name": "Admin",
+            "allowedRoles": [
+                "1013262282748346400"
+            ]
+        }
+    },
+    "formattedDepartments": [
+        {
+            "name": "Los Santos Police Department",
+            "value": "LSPD"
+        },
+        {
+            "name": "Blaine County Sheriff's Office",
+            "value": "BCSO"
+        },
+        {
+            "name": "San Andreas Highway Patrol",
+            "value": "SAHP"
+        },
+        {
+            "name": "Los Santos County Fire Department",
+            "value": "LSCFD"
+        },
+        {
+            "name": "Civilian",
+            "value": "CIV"
+        },
+        {
+            "name": "Certified Civilian",
+            "value": "CC"
+        },
+        {
+            "name": "Admin",
+            "value": "admin"
+        }
+    ]
 }
