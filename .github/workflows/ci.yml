@@ -27,13 +27,3 @@ jobs:
         with:
           name: DutyLogs-Bot.zip
           path: ${{ github.workspace }}/DutyLogs-Bot.zip
-
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/*
-          asset_name: DutyLogs-Package
-          tag: ${{ github.ref }}
-          overwrite: true
-          body: "Latest Release"
