@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: DutyLogs-Script.zip
-          path: ${{ github.workspace }}/DutyLogs-Script.zip
+          path: DutyLogs-Script.zip
 
       - run: |
           rm -r script
@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: DutyLogs-Bot.zip
-          path: ${{ github.workspace }}/DutyLogs-Bot.zip
+          path: DutyLogs-Bot.zip
 
       - name: Create Release
         id: create_release
