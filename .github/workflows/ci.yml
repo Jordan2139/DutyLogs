@@ -73,7 +73,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/artifact/script.zip
+          asset_path: ${{ github.workspace }}/artifact/script/script.zip
           asset_name: DutyLogs-Script.zip
           asset_content_type: application/zip
 
@@ -83,6 +83,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/artifact/bot.zip
+          asset_path: ${{ github.workspace }}/artifact/bot/bot.zip
           asset_name: DutyLogs-Bot.zip
           asset_content_type: application/zip
