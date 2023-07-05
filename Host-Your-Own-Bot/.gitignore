@@ -1,7 +1,0 @@
-node_modules
-package-lock.json
-config/config.json
-.wakatime-project
-script/config.js
-.luacheckrc
-src/structure/client/updatemanager.js
