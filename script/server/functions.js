@@ -238,7 +238,7 @@ on('playerConnecting', (name, setKickReason, deferrals) => {
         checkres = customStringify(checkres)
         logDebug('checkres: ' + JSON.stringify(checkres))
     }
-    emitNet('OndutyLogs::getConfig::Client', src, config.dutyCount)
+    emitNet('OndutyLogs::getConfig::Client', src, config.dutyCount, config.departments)
 })
 
 on('playerDropped', async (reason) => {

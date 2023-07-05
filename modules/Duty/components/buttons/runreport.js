@@ -2,17 +2,17 @@ const { Embed, Row, Button, Menu } = require("../../../../src/structure/backend/
 module.exports.run = function (client, interaction, data) {
     data = data.split("-");
     if (data[1] !== interaction.member.id) return interaction.reply({ content: "You cannot use this menu.", ephemeral: true });
-    if (data[0] && !client.cache[interaction.member.id].checklogs) return interaction.reply({ content: "It looks like the checklogs process has timed out. Please rerun the /checklogs command to start again.", ephemeral: true });
+    if (data[0] && !client.cache[interaction.member.id].runreport) return interaction.reply({ content: "It looks like the checklogs process has timed out. Please rerun the /checklogs command to start again.", ephemeral: true });
     switch (data[0]) {
         case "next25":
-            client.db.query(`SELECT * FROM dutylogs WHERE steam = '${steamId}' AND server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC OFFSET ${data[2].id + 25}`, function (err, logs) {
+            client.db.query(`SELECT * FROM dutylogs WHERE server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC OFFSET ${data[2].id + 25}`, function (err, logs) {
                 if (logs.length === 0) return interaction.reply({ content: "There's not more than 25 logs for that user.", ephemeral: true });
                 let menu;
                 menu = new Menu()
                     .setPlaceholder("📄Select a log to view...")
                     .setMax(1)
                     .setType(3)
-                    .setCustomId("logmenu-select")
+                    .setCustomId("runreport-select")
                 for (let i = 0; i < 25; i++) {
                     if (logs[i]) {
                         const date = new Date(logs[i].endtime)
@@ -36,13 +36,13 @@ module.exports.run = function (client, interaction, data) {
                     new Row()
                         .addComponent(
                             new Button()
-                                .setCustomId(`logmenu-prev25-${user.id}-${logs[0].id}`)
+                                .setCustomId(`runreport-prev25-${user.id}-${logs[0].id}`)
                                 .setLabel("Previous 25")
                                 .setStyle(3)
                                 .setEmoji('◀')
                         ).addComponent(
                             new Button()
-                                .setCustomId(`logmenu-next25-${user.id}-${logs[0].id}`)
+                                .setCustomId(`runreport-next25-${user.id}-${logs[0].id}`)
                                 .setLabel("Next 25")
                                 .setStyle(3)
                                 .setEmoji('▶')
@@ -52,14 +52,14 @@ module.exports.run = function (client, interaction, data) {
                 interaction.reply({ embeds: [embed], components: row });
             });
             break;
-        case "prev25": client.db.query(`SELECT * FROM dutylogs WHERE steam = '${steamId}' AND server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC OFFSET ${data[2].id - 25}`, function (err, logs) {
+        case "prev25": client.db.query(`SELECT * FROM dutylogs WHERE server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC OFFSET ${data[2].id - 25}`, function (err, logs) {
             if (logs.length === 0) return interaction.reply({ content: "There's not more than 25 logs for that user.", ephemeral: true });
             let menu;
             menu = new Menu()
                 .setPlaceholder("📄Select a log to view...")
                 .setMax(1)
                 .setType(3)
-                .setCustomId("logmenu-select")
+                .setCustomId("runreport-select")
             for (let i = 0; i < 25; i++) {
                 if (logs[i]) {
                     const date = new Date(logs[i].endtime)
@@ -83,13 +83,13 @@ module.exports.run = function (client, interaction, data) {
                 new Row()
                     .addComponent(
                         new Button()
-                            .setCustomId(`logmenu-prev25-${user.id}-${logs[0].id}`)
+                            .setCustomId(`runreport-prev25-${user.id}-${logs[0].id}`)
                             .setLabel("Previous 25")
                             .setStyle(3)
                             .setEmoji('◀')
                     ).addComponent(
                         new Button()
-                            .setCustomId(`logmenu-next25-${user.id}-${logs[0].id}`)
+                            .setCustomId(`runreport-next25-${user.id}-${logs[0].id}`)
                             .setLabel("Next 25")
                             .setStyle(3)
                             .setEmoji('▶')
@@ -100,31 +100,26 @@ module.exports.run = function (client, interaction, data) {
         });
             break;
         case "goback":
-            department = client.cache[interaction.member.id].checklogs.department.toLowerCase()
-            const user = client.cache[interaction.member.id].checklogs.user;
-            const timeframe = client.cache[interaction.member.id].checklogs.timeframe;
-            const userRoles = interaction.member.roles.cache.map(role => role.id);
-            if (!userRoles.some(roleId => client.config.departments[department.toUpperCase()].allowedRoles.includes(roleId))) return interaction.reply({ content: "You do not have permission to use this command.", ephemeral: true })
-            client.db.query(`SELECT * from players WHERE discord = ?`, [user.id], async function (err, userRes) {
-                steamId = userRes[0].steam;
-                if (!steamId) return interaction.reply({ content: "That user is not linked to a steam account.", ephemeral: true });
-                client.db.query(`SELECT * FROM servers WHERE guild = ?`, [interaction.guild.id], async function (err, serverRes) {
-                    if (!serverRes[0]) return interaction.reply({ content: "This server is not configured in the database. Please contact an administrator.", ephemeral: true });
-                    client.db.query(`SELECT SUM(TIME_TO_SEC(TIMEDIFF(endtime, starttime))) AS total_time FROM dutylogs WHERE steam = ? AND server = ? AND department = ? AND starttime >= DATE_SUB(NOW(), INTERVAL ${timeframe}) AND endtime <= NOW()`, [steamId, serverRes[0].id, department], async function (err, totalTimeRes) {
-                        if (totalTimeRes[0].total_time == null) return interaction.reply({ content: "No logs found for that user in that department.", ephemeral: true })
+            department = client.cache[interaction.member.id].runreport.department.toLowerCase()
+            timeframe = client.cache[interaction.member.id].runreport.timeframe
+            client.db.query(`SELECT * FROM servers WHERE guild = ?`, [interaction.guild.id], async function (err, serverRes) {
+                if (!serverRes[0]) return interaction.reply({ content: "This server is not configured in the database. Please contact an administrator.", ephemeral: true });
+                client.db.query(`SELECT SUM(TIME_TO_SEC(TIMEDIFF(endtime, starttime))) AS total_time FROM dutylogs WHERE server = ? AND department = ? AND starttime >= DATE_SUB(NOW(), INTERVAL ${timeframe}) AND endtime <= NOW()`, [serverRes[0].id, department], async function (err, totalTimeRes) {
+                    if (totalTimeRes[0].total_time == null) return interaction.reply({ content: "No logs found for that department.", ephemeral: true })
+                    client.db.query(`SELECT * FROM dutylogs WHERE server = ? AND department = ? AND starttime >= DATE_SUB(NOW(), INTERVAL ${timeframe}) AND endtime <= NOW()`, [serverRes[0].id, department], async function (err, sessionRes) {
                         const embed = new Embed()
-                            .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
-                            .setDescription(`## ${user}'s Duty Logs\n### Showing logs for ${timeframe} in ${client.config.departments[department.toUpperCase()].name}\n\n### Total time on duty in ${timeframe}: \`${formatDuration(totalTimeRes[0].total_time)}\`\n\n### Logs:`)
+                            .setAuthor({ name: interaction.member.tag, iconURL: interaction.member.displayAvatarURL() })
+                            .setDescription(`## ${client.config.departments[department.toUpperCase()].name}'s Duty Logs\n### Showing logs for the last ${timeframe}\n\n\n\n## Total Logs: ${sessionRes.length} \n\n### Total time on duty in ${timeframe}: \`${formatDuration(totalTimeRes[0].total_time)}\`\n\n### Logs:`)
                             .setColor(client.config.color)
                             .setTimestamp();
-                        client.db.query(`SELECT * FROM dutylogs WHERE steam = '${steamId}' AND server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC`, function (err, logs) {
+                        client.db.query(`SELECT * FROM dutylogs WHERE server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC`, function (err, logs) {
                             if (logs.length === 0) return interaction.reply({ content: "No logs found for that user in that department.", ephemeral: true });
                             let menu;
                             menu = new Menu()
                                 .setPlaceholder("📄Select a log to view...")
                                 .setMax(1)
                                 .setType(3)
-                                .setCustomId("logmenu-select")
+                                .setCustomId("runreport-select")
                             for (let i = 0; i < 25; i++) {
                                 if (logs[i]) {
                                     const date = new Date(logs[i].endtime)
@@ -145,12 +140,12 @@ module.exports.run = function (client, interaction, data) {
                                 }
                             }
                             let prevButton = new Button()
-                                .setCustomId(`logmenu-prev25-${user.id}-${logs[0].id}`)
+                                .setCustomId(`runreport-prev25-${logs[0].id}`)
                                 .setLabel("Previous 25")
                                 .setStyle(3)
                                 .setEmoji('◀')
                             let nextButton = new Button()
-                                .setCustomId(`logmenu-next25-${user.id}-${logs[0].id}`)
+                                .setCustomId(`runreport-next25-${logs[0].id}`)
                                 .setLabel("Next 25")
                                 .setStyle(3)
                                 .setEmoji('▶')
@@ -161,10 +156,9 @@ module.exports.run = function (client, interaction, data) {
                         });
                     });
                 });
-                delete client.cache[interaction.member.id].checklogs;
+                delete client.cache[interaction.member.id].runreport;
                 client.cache[interaction.member.id] = {
-                    checklogs: {
-                        user: user,
+                    runreport: {
                         timeframe: timeframe,
                         department: department
                     }

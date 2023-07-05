@@ -21,6 +21,7 @@ let shouldShowBlips = false;
 let showDutyCount = true;
 let dutyCountConfig = {};
 let serverBlips = [];
+let departmentConfig = {};
 
 /*
      * Registering Commands and Suggestions
@@ -88,8 +89,9 @@ onNet('OndutyLogs::CheckDuty::Callback', (status, error) => {
 })
 
 RegisterNetEvent('OndutyLogs::getConfig::Callback')
-onNet('OndutyLogs::getConfig::Callback', (config) => {
-     dutyCountConfig = config;
+onNet('OndutyLogs::getConfig::Callback', (configDutyCount, configDepartments) => {
+     dutyCountConfig = configDutyCount;
+     departmentConfig = configDepartments;
 })
 
 RegisterNetEvent('OndutyLogs::Callback')
@@ -132,8 +134,26 @@ on('OndutyLogs::UpdateBlips::Client', function (activeBlips) {
 
 if (dutyCountConfig.enabled && showDutyCount) {
      setTick(async () => {
+          const departmentCounts = {};
+          const typeCounts = {};
+          for (const blip of ActiveBlips) {
+               const department = blip.abbr.toUpperCase();
+               const type = blip.blips.type;
+               if (departmentConfig[department]) {
+                    const departmentCategory = departmentConfig[department].type || department;
+                    departmentCounts[departmentCategory] = (departmentCounts[departmentCategory] || 0) + 1;
+               }
+               typeCounts[type] = (typeCounts[type] || 0) + 1;
+          }
+
           let pos = dutyCountConfig.display.pos;
           let text1 = `On Duty: ${department ? department.name : 'N/A'}`;
+          if (dutyCountConfig.groupBy === 'department') {
+               departmentCounts.forEach((department) => {
+                    text2 += `\n${department.name}: ${department.count}`
+
+               })
+          }
           let text2 = ``
           while (showDutyCount) {
                SetTextScale(0.35, 0.35);
@@ -142,6 +162,7 @@ if (dutyCountConfig.enabled && showDutyCount) {
                SetTextOutline();
                BeginTextCommandDisplayText("STRING");
                AddTextComponentSubstringPlayerName(text1);
+               AddTextComponentSubstringPlayerName(text2);
                EndTextCommandDisplayText(pos.x, pos.y);
           }
           await Wait(dutyCountConfig.interval);

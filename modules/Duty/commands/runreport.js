@@ -1,16 +1,10 @@
 const { Command, Embed, Menu, Row, Button } = require("../../../src/structure/backend/build");
 const config = require("../../../config/config.json");
 module.exports.info = new Command()
-    .setName("checklogs")
-    .setDescription("See a players time on duty in a specified department.")
+    .setName("runreport")
+    .setDescription("See a full report of a departments dutylogs.")
     .setCategory("Utility")
     .addOption(
-        new Command.optionBuilder()
-            .setName("user")
-            .setDescription("The users who's duty time you'd like to get")
-            .setType(6)
-            .setRequired(true)
-    ).addOption(
         new Command.optionBuilder()
             .setName("timeframe")
             .setDescription("The timeframe you'd like to check for")
@@ -26,32 +20,29 @@ module.exports.info = new Command()
     );
 module.exports.run = async function (client, interaction) {
     if (!isValidTimeType(interaction.options.get('timeframe').value)) return interaction.reply({ content: "Invalid timeframe provided. Please use the format `1d` for 1 day, `1w` for 1 week, `1M` for 1 month, or `1y` for 1 year.", ephemeral: true });
-    const user = interaction.options.get('user').user;
     const timeframe = convertAbbreviatedDuration(interaction.options.get('timeframe').value);
     let department = interaction.options.get('department').value;
     department = department.toLowerCase()
     const userRoles = interaction.member.roles.cache.map(role => role.id);
     if (!userRoles.some(roleId => config.departments[department.toUpperCase()].allowedRoles.includes(roleId))) return interaction.reply({ content: "You do not have permission to use this command.", ephemeral: true })
-    await client.db.query(`SELECT * from players WHERE discord = ?`, [user.id], async function (err, userRes) {
-        steamId = userRes[0].steam;
-        if (!steamId) return interaction.reply({ content: "That user is not linked to a steam account.", ephemeral: true });
-        await client.db.query(`SELECT * FROM servers WHERE guild = ?`, [interaction.guild.id], async function (err, serverRes) {
-            if (!serverRes[0]) return interaction.reply({ content: "This server is not configured in the database. Please contact an administrator.", ephemeral: true });
-            await client.db.query(`SELECT SUM(TIME_TO_SEC(TIMEDIFF(endtime, starttime))) AS total_time FROM dutylogs WHERE steam = ? AND server = ? AND department = ? AND starttime >= DATE_SUB(NOW(), INTERVAL ${timeframe}) AND endtime <= NOW()`, [steamId, serverRes[0].id, department], async function (err, totalTimeRes) {
-                if (totalTimeRes[0].total_time == null) return interaction.reply({ content: "No logs found for that user in that department.", ephemeral: true })
+    await client.db.query(`SELECT * FROM servers WHERE guild = ?`, [interaction.guild.id], async function (err, serverRes) {
+        if (!serverRes[0]) return interaction.reply({ content: "This server is not configured in the database. Please contact an administrator.", ephemeral: true });
+        await client.db.query(`SELECT SUM(TIME_TO_SEC(TIMEDIFF(endtime, starttime))) AS total_time FROM dutylogs WHERE server = ? AND department = ? AND starttime >= DATE_SUB(NOW(), INTERVAL ${timeframe}) AND endtime <= NOW()`, [serverRes[0].id, department], async function (err, totalTimeRes) {
+            if (totalTimeRes[0].total_time == null) return interaction.reply({ content: "No logs found for that department.", ephemeral: true })
+            await client.db.query(`SELECT * FROM dutylogs WHERE server = ? AND department = ? AND starttime >= DATE_SUB(NOW(), INTERVAL ${timeframe}) AND endtime <= NOW()`, [serverRes[0].id, department], async function (err, sessionRes) {
                 const embed = new Embed()
-                    .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
-                    .setDescription(`## ${user}'s Duty Logs\n### Showing logs for ${timeframe} in ${config.departments[department.toUpperCase()].name}\n\n### Total time on duty in ${timeframe}: \`${formatDuration(totalTimeRes[0].total_time)}\`\n\n### Logs:`)
+                    .setAuthor({ name: interaction.member.tag, iconURL: interaction.member.displayAvatarURL() })
+                    .setDescription(`## ${config.departments[department.toUpperCase()].name}'s Duty Logs\n### Showing logs for the last ${timeframe}\n\n\n\n## Total Logs: ${sessionRes.length} \n\n### Total time on duty in ${timeframe}: \`${formatDuration(totalTimeRes[0].total_time)}\`\n\n### Logs:`)
                     .setColor(config.color)
                     .setTimestamp();
-                await client.db.query(`SELECT * FROM dutylogs WHERE steam = '${steamId}' AND server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC`, function (err, logs) {
+                await client.db.query(`SELECT * FROM dutylogs WHERE server = ${serverRes[0].id} AND department = '${department}' AND endtime > NOW() - INTERVAL ${timeframe} ORDER BY id DESC`, function (err, logs) {
                     if (logs.length === 0) return interaction.reply({ content: "No logs found for that user in that department.", ephemeral: true });
                     let menu;
                     menu = new Menu()
                         .setPlaceholder("📄Select a log to view...")
                         .setMax(1)
                         .setType(3)
-                        .setCustomId("logmenu-select")
+                        .setCustomId("runreport-select")
                     for (let i = 0; i < 25; i++) {
                         if (logs[i]) {
                             const date = new Date(logs[i].endtime)
@@ -72,12 +63,12 @@ module.exports.run = async function (client, interaction) {
                         }
                     }
                     let prevButton = new Button()
-                        .setCustomId(`logmenu-prev25-${user.id}-${logs[0].id}`)
+                        .setCustomId(`runreport-prev25-${logs[0].id}`)
                         .setLabel("Previous 25")
                         .setStyle(3)
                         .setEmoji('◀')
                     let nextButton = new Button()
-                        .setCustomId(`logmenu-next25-${user.id}-${logs[0].id}`)
+                        .setCustomId(`runreport-next25-${logs[0].id}`)
                         .setLabel("Next 25")
                         .setStyle(3)
                         .setEmoji('▶')
@@ -87,14 +78,13 @@ module.exports.run = async function (client, interaction) {
                     interaction.reply({ embeds: [embed], components: row });
                 });
             });
-            client.cache[interaction.member.id] = {
-                checklogs: {
-                    user: user,
-                    timeframe: timeframe,
-                    department: department
-                }
-            };
         });
+        client.cache[interaction.member.id] = {
+            runreport: {
+                timeframe: timeframe,
+                department: department
+            }
+        };
     });
 };
 
