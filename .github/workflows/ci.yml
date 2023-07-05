@@ -18,11 +18,14 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: DutyLogs-Script.zip
-          path: ./bin/DutyLogs-Script.zip
+          path: DutyLogs-Script.zip
 
       - name: Remove script directory
         run: rm -r script
 
+      - name: Remove Unneeded Files
+        run: rm -rf .gitignore; rm -rf .gitattributes
+        
       - name: Generate DutyLogs-Bot.zip
         run: zip -r DutyLogs-Bot.zip .
 
@@ -58,7 +61,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/DutyLogs-Script.zip
+          asset_path: /DutyLogs-Script.zip
           asset_name: DutyLogs-Script.zip
           asset_content_type: application/zip
 
@@ -68,6 +71,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/DutyLogs-Bot.zip
+          asset_path: /DutyLogs-Bot.zip
           asset_name: DutyLogs-Bot.zip
           asset_content_type: application/zip
