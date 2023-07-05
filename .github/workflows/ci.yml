@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: DutyLogs-Bot.zip
-          path: .
+          path: Host-Your-Own-Bot
 
       - name: Create Release
         id: create_release
@@ -41,7 +41,7 @@ jobs:
           body: Automated release
           draft: false
           prerelease: false
-          
+
       - name: Create Folder
         run: |
           mkdir -p ${{ github.workspace }}/artifact
@@ -59,7 +59,7 @@ jobs:
           path: ${{ github.workspace }}/artifact/bot
       - name: Check Files
         run: cd ${{ github.workspace }}/artifact; ls
-        
+
       - name: Zip Downloads
         run: |
           cd ${{ github.workspace }}/artifact
