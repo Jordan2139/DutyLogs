@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: DutyLogs-Script.zip
-          path: script
+          path: .
 
       - name: Download DutyLogs-Bot Artifact
         uses: actions/download-artifact@v1
