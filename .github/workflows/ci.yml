@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Upload DutyLogs-Script Artifact
         uses: actions/upload-artifact@v1
         with:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Remove Unneeded Files
         run: rm -rf .gitignore; rm -rf .gitattributes; rm -r .github; rm -r .git;
-        
+
       - name: Upload DutyLogs-Bot Artifact
         uses: actions/upload-artifact@v1
         with:
@@ -46,24 +46,21 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: DutyLogs-Script.zip
-          path: .
+          path: script
 
       - name: Download DutyLogs-Bot Artifact
         uses: actions/download-artifact@v1
         with:
           name: DutyLogs-Bot.zip
           path: .
-      
-      - name: Verify Downloads
-        run: ls
-        
+
       - name: Attach Artifacts to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/work/DutyLogs/DutyLogs/DutyLogs-Script.zip
+          asset_path: script/DutyLogs-Script.zip
           asset_name: DutyLogs-Script.zip
           asset_content_type: application/zip
 
@@ -74,5 +71,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: DutyLogs-Bot.zip
-          asset_name: /home/runner/work/DutyLogs/DutyLogs/DutyLogs-Bot.zip
+          asset_name: DutyLogs-Bot.zip
           asset_content_type: application/zip
