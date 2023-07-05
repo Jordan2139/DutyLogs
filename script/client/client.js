@@ -22,6 +22,7 @@ let showDutyCount = true;
 let dutyCountConfig = {};
 let serverBlips = [];
 let departmentConfig = {};
+let recievedConfig = false;
 
 /*
      * Registering Commands and Suggestions
@@ -52,14 +53,6 @@ RegisterCommand('checkduty', () => {
           emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^1[ERROR] ^7You are not on duty.`] })
      }
 })
-
-if (dutyCountConfig) {
-     RegisterCommand('dutycount', () => {
-          showDutyCount = !showDutyCount;
-          emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7Duty count is now ${showDutyCount ? 'enabled' : 'disabled'}`] })
-     })
-     emit('chat:addSuggestion', '/dutycount', '[SSRP Duty Logs] Toggle the duty count.', [])
-}
 
 emit('chat:addSuggestion', '/duty', '[SSRP Duty Logs] Toggle your duty status.', [{ name: 'department', help: 'The department you are going on duty as.' }])
 emit('chat:addSuggestion', '/checkduty', '[SSRP Duty Logs] Check the duty status of other players.', [])
@@ -92,6 +85,7 @@ RegisterNetEvent('OndutyLogs::getConfig::Callback')
 onNet('OndutyLogs::getConfig::Callback', (configDutyCount, configDepartments) => {
      dutyCountConfig = configDutyCount;
      departmentConfig = configDepartments;
+     recievedConfig = true;
 })
 
 RegisterNetEvent('OndutyLogs::Callback')
@@ -103,7 +97,6 @@ onNet('OndutyLogs::Callback', (status, error) => {
                emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7You are now on duty as ${status.department.name}. \n${status.department.blips.enabled ? 'You have access to ' + status.department.blips.type + ' blips' : 'This department does not have access to blips'}`] })
                onduty = true;
                department = status.department;
-               console.log(department)
           } else {
                emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7You are now off duty as ${status.department.name}.\n ${status.department.blips.enabled ? 'Your ' + status.department.blips.type + ' have been disabled' : ''}`] })
                onduty = false;
@@ -132,42 +125,19 @@ on('OndutyLogs::UpdateBlips::Client', function (activeBlips) {
      }
 })
 
-if (dutyCountConfig.enabled && showDutyCount) {
-     setTick(async () => {
-          const departmentCounts = {};
-          const typeCounts = {};
-          for (const blip of ActiveBlips) {
-               const department = blip.abbr.toUpperCase();
-               const type = blip.blips.type;
-               if (departmentConfig[department]) {
-                    const departmentCategory = departmentConfig[department].type || department;
-                    departmentCounts[departmentCategory] = (departmentCounts[departmentCategory] || 0) + 1;
-               }
-               typeCounts[type] = (typeCounts[type] || 0) + 1;
-          }
-
-          let pos = dutyCountConfig.display.pos;
-          let text1 = `On Duty: ${department ? department.name : 'N/A'}`;
-          if (dutyCountConfig.groupBy === 'department') {
-               departmentCounts.forEach((department) => {
-                    text2 += `\n${department.name}: ${department.count}`
-
-               })
-          }
-          let text2 = ``
-          while (showDutyCount) {
-               SetTextScale(0.35, 0.35);
-               SetTextFont(4);
-               SetTextProportional(1);
-               SetTextOutline();
-               BeginTextCommandDisplayText("STRING");
-               AddTextComponentSubstringPlayerName(text1);
-               AddTextComponentSubstringPlayerName(text2);
-               EndTextCommandDisplayText(pos.x, pos.y);
-          }
-          await Wait(dutyCountConfig.interval);
-     })
-}
+let getConfigTick = setTick(async () => {
+     while (!recievedConfig) {
+          console.log('Waiting for config...')
+          emitNet('OndutyLogs::getConfig')
+          await Wait(3000)
+     }
+     console.log('Config recieved.')
+     console.log('Duty Count Enabled: ' + dutyCountConfig.enabled)
+     if (dutyCountConfig.enabled) {
+          enableOnScreenCount()
+     }
+     clearTick(getConfigTick)
+})
 
 /*
      * Functions
@@ -242,4 +212,51 @@ function RefreshBlips(activeBlips) {
  */
 function Wait(ms) {
      return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * @description Enables the duty count on the screen.
+ * @example enableOnScreenCount()
+ * @returns {void}
+*/
+function enableOnScreenCount() {
+     RegisterCommand('dutycount', () => {
+          showDutyCount = !showDutyCount;
+          emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7Duty count is now ${showDutyCount ? 'enabled' : 'disabled'}`] })
+     })
+     emit('chat:addSuggestion', '/dutycount', '[SSRP Duty Logs] Toggle the duty count.', [])
+
+     setTick(async () => {
+          const departmentCounts = {};
+          const typeCounts = {};
+          for (const blip of serverBlips) {
+               const department1 = blip.blips.label.toUpperCase();
+               const type = blip.blips.type;
+               if (departmentConfig[department1]) {
+                    const departmentCategory = departmentConfig[department1].type || department1;
+                    departmentCounts[departmentCategory] = (departmentCounts[departmentCategory] || 0) + 1;
+               }
+               typeCounts[type] = (typeCounts[type] || 0) + 1;
+          }
+          let pos = dutyCountConfig.display.pos;
+          let text1 = `On Duty: ${department ? department.name : 'N/A'}`;
+          if (dutyCountConfig.groupBy === 'department') {
+               for (const department in departmentCounts) {
+                    text1 += `\n${department}: ${departmentCounts[department]}`
+               }
+          } else if (dutyCountConfig.groupBy === 'blipType') {
+               for (const type in typeCounts) {
+                    text1 += `\n${type.toUpperCase()}: ${typeCounts[type]}`
+               }
+          }
+          if (showDutyCount) {
+               SetTextScale(0.35, 0.35);
+               SetTextFont(4);
+               SetTextProportional(1);
+               SetTextOutline();
+               BeginTextCommandDisplayText("STRING");
+               AddTextComponentSubstringPlayerName(text1);
+               EndTextCommandDisplayText(pos.x, pos.y);
+          }
+     })
 }

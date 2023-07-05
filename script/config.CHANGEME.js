@@ -7,12 +7,11 @@ module.exports = {
     },
     dutyCount: {
         enabled: true, // Enable the duty count
-        interval: 3000, // How often to update the duty count (in ms)
         groupBy: 'department', // Options: department, blipType
         display: {
             pos: {
-                x: 0.005,
-                y: 0.005
+                x: 0.158,
+                y: 0.90
             }
         }
     },

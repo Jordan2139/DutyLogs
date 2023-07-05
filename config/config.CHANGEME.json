@@ -9,7 +9,7 @@
     "api": {
         "port": 9696,
         "listenAddress": "127.0.0.1",
-        "secretkey": "ilikeass"
+        "secretkey": ""
     },
     "express": {
         "domain": "http://localhost:3000",

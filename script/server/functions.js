@@ -238,7 +238,6 @@ on('playerConnecting', (name, setKickReason, deferrals) => {
         checkres = customStringify(checkres)
         logDebug('checkres: ' + JSON.stringify(checkres))
     }
-    emitNet('OndutyLogs::getConfig::Client', src, config.dutyCount, config.departments)
 })
 
 on('playerDropped', async (reason) => {
@@ -284,6 +283,11 @@ on('playerDropped', async (reason) => {
             logDebug('Client id: ' + source + ' (' + GetPlayerName(source) + ') has been removed from the activeBlips array because they left the server.')
         }
     }
+})
+
+RegisterNetEvent('OndutyLogs::getConfig')
+onNet('OndutyLogs::getConfig', async () => {
+    emitNet('OndutyLogs::getConfig::Callback', source, config.dutyCount, config.departments)
 })
 
 RegisterNetEvent('OndutyLogs::CheckDuty')
