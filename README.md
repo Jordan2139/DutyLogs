@@ -50,7 +50,7 @@ For a complete list of commands and usage instructions, please refer to the bot'
 
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute to the FiveM Duty Logs Bot, please follow the guidelines outlined in the [CONTRIBUTING.md](link-to-contributing-file) file.
+Contributions are welcome! If you'd like to contribute to the FiveM Duty Logs Bot, please follow the guidelines outlined in the [CONTRIBUTING.md]([link-to-contributing-file](https://github.com/Jordan2139/DutyLogs/blob/master/CONTRIBUTING.md)) file.
 
 ## License
 
