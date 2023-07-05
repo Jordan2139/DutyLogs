@@ -12,8 +12,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         
-      - name: Upload DutyLogs-Script Artifact
-        uses: actions/upload-artifact@v1
+      - name: Download DutyLogs-Script Artifact
+        uses: actions/download-artifact@v1
         with:
           name: DutyLogs-Script.zip
           path: script
@@ -24,14 +24,11 @@ jobs:
       - name: Remove Unneeded Files
         run: rm -rf .gitignore; rm -rf .gitattributes; rm -r .github; rm -r .git;
         
-      - name: Upload DutyLogs-Bot Artifact
-        uses: actions/upload-artifact@v1
+      - name: Download DutyLogs-Bot Artifact
+        uses: actions/download-artifact@v1
         with:
           name: DutyLogs-Bot.zip
           path: .
-          
-      - name: Verify Artifact Files
-        run: ls -R
 
       - name: Create Release
         id: create_release
