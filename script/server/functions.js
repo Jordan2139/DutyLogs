@@ -312,6 +312,13 @@ setTick(async function () {
     }
 })
 
+setTick(async function () {
+    while (true) {
+        versionCheck()
+        await Wait(3600000)
+    }
+})
+
 /*
     * Functions
     * ExtractIdentifiers is used to extract the identifiers from a player.
@@ -421,4 +428,65 @@ function customStringify(obj) {
  */
 function Wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * @description Check if the version of the resource matches the version on GitHub.
+ * @example
+ * versionCheck()
+ */
+function versionCheck() {
+    axios.get('https://raw.githubusercontent.com/Jordan2139/DutyLogs/master/version.json')
+        .then(response => {
+            const data = response.data;
+            const version = data['fivem-script']['version'];
+            const releaseNotes = data['fivem-script']['releaseTitle'];
+            const currentVersion = GetResourceMetadata(GetCurrentResourceName(), "version", 0)
+            if (version === currentVersion) {
+                logDebug('Versions match!');
+                console.log(`
+//
+||        ____        __        __
+||       / __ \\__  __/ /___  __/ /   ____  ____ ______
+||      / / / / / / / __/ / / / /   / __ \\/ __ \`/ ___/
+||     / /_/ / /_/ / /_/ /_/ / /___/ /_/ / /_/ (__  )
+||    /_____/\\__,_/\\__/\\__, /_____/\\____/\\__, /____/
+||                    /____/            /____/
+||
+||                Created by Jordan2139
+||
+||           Current version: ${currentVersion}
+||             Latest version : ${version}
+||        ^2DutyLogs is up to date on this server.^0
+||
+\\\\
+            `);
+            } else {
+                logDebug('Versions do not match.');
+                console.log(`
+//
+||        ____        __        __
+||       / __ \\__  __/ /___  __/ /   ____  ____ ______
+||      / / / / / / / __/ / / / /   / __ \\/ __ \`/ ___/
+||     / /_/ / /_/ / /_/ /_/ / /___/ /_/ / /_/ (__  )
+||    /_____/\\__,_/\\__/\\__, /_____/\\____/\\__, /____/
+||                    /____/            /____/
+||
+||                Created by Jordan2139
+||
+||           Current version: ${currentVersion}
+||             Latest version : ${version}
+||        ^1DutyLogs is no up to date on this server.^0
+||          ^1Please update to the latest version.^0
+||            ^1Release notes: ${releaseNotes}^0
+||           ^1Download: https://github.com/Jordan2139/DutyLogs/releases/latest^0
+||
+\\\\
+`);
+            }
+        })
+        .catch(error => {
+            logError(error);
+        });
+
 }
