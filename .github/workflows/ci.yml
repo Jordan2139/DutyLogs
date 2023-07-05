@@ -11,9 +11,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-#       - name: Generate DutyLogs-Script.zip
-#         run: zip -r DutyLogs-Script.zip script
         
       - name: Upload DutyLogs-Script Artifact
         uses: actions/upload-artifact@v1
@@ -27,14 +24,14 @@ jobs:
       - name: Remove Unneeded Files
         run: rm -rf .gitignore; rm -rf .gitattributes; rm -r .github; rm -r .git;
         
-#       - name: Generate DutyLogs-Bot.zip
-#         run: zip -r DutyLogs-Bot.zip .
-
       - name: Upload DutyLogs-Bot Artifact
         uses: actions/upload-artifact@v1
         with:
           name: DutyLogs-Bot.zip
           path: .
+          
+      - name: Verify Artifact Files
+        run: ls -R
 
       - name: Create Release
         id: create_release
@@ -47,14 +44,6 @@ jobs:
           body: Automated release
           draft: false
           prerelease: false
-
-#       - name: Upload Artifacts
-#         uses: actions/upload-artifact@v1
-#         with:
-#           name: Release Artifacts
-#           path: |
-#             /home/runner/work/DutyLogs/DutyLogs/DutyLogs-Script.zip
-#             /home/runner/work/DutyLogs/DutyLogs/DutyLogs-Bot.zip
 
       - name: Attach Artifacts to Release
         uses: actions/upload-release-asset@v1
