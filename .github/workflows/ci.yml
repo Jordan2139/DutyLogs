@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   upload_to_sftp:
@@ -12,74 +12,77 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Zip Folder
-        uses: vimtor/action-zip@v1
-        with:
-          files: /script
-          recursive: true
-          dest: DutyLogs-Script.zip
-
       - name: Upload DutyLogs-Script Artifact
         uses: actions/upload-artifact@v1
         with:
           name: DutyLogs-Script.zip
-          path: ${{ github.workspace }}/DutyLogs-Script.zip
+          path: script
 
-      - run: |
-          rm -r script
-          rm -rf .gitignore
-          rm -rf .gitattributes
-          rm -r DutyLogs-Script.zip
+      - name: Remove script directory
+        run: rm -r script
 
-      - name: Zip Folder
-        uses: vimtor/action-zip@v1
-        with:
-          files: /
-          recursive: true
-          dest: DutyLogs-Bot.zip
+      - name: Remove Unneeded Files
+        run: rm -rf .gitignore; rm -rf .gitattributes; rm -r .github; rm -r .git;
 
       - name: Upload DutyLogs-Bot Artifact
         uses: actions/upload-artifact@v1
         with:
           name: DutyLogs-Bot.zip
-          path: ${{ github.workspace }}/DutyLogs-Bot.zip
+          path: .
 
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: release-${{ github.run_number }}-${{ github.run_id }}
+          release_name: Latest
           body: Automated release
           draft: false
           prerelease: false
+          
+      - name: Create Folder
+        run: |
+          mkdir -p ${{ github.workspace }}/artifact
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v1
+      - name: Download DutyLogs-Script Artifact
+        uses: actions/download-artifact@v1
         with:
-          name: Release Artifacts
-          path: |
-            ${{ github.workspace }}/DutyLogs-Script.zip
-            ${{ github.workspace }}/DutyLogs-Bot.zip
+          name: DutyLogs-Script.zip
+          path: ${{ github.workspace }}/artifact/script
 
+      - name: Download DutyLogs-Bot Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: DutyLogs-Bot.zip
+          path: ${{ github.workspace }}/artifact/bot
+      - name: Check Files
+        run: cd ${{ github.workspace }}/artifact; ls
+        
+      - name: Zip Downloads
+        run: |
+          cd ${{ github.workspace }}/artifact
+          cd bot
+          zip -r bot.zip .
+          cd ../script
+          zip -r script.zip .
       - name: Attach Artifacts to Release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/DutyLogs-Script.zip
+          asset_path: ${{ github.workspace }}/artifact/script/script.zip
           asset_name: DutyLogs-Script.zip
           asset_content_type: application/zip
 
       - name: Attach Artifacts to Release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/DutyLogs-Bot.zip
+          asset_path: ${{ github.workspace }}/artifact/bot/bot.zip
           asset_name: DutyLogs-Bot.zip
           asset_content_type: application/zip
