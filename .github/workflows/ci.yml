@@ -60,7 +60,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: script/DutyLogs-Script.zip
+          asset_path: /home/runner/work/DutyLogs/DutyLogs/DutyLogs-Script.zip
           asset_name: DutyLogs-Script.zip
           asset_content_type: application/zip
 
@@ -71,5 +71,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: DutyLogs-Bot.zip
-          asset_name: DutyLogs-Bot.zip
+          asset_name: /home/runner/work/DutyLogs/DutyLogs/DutyLogs-Bot.zip
           asset_content_type: application/zip
