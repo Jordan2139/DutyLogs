@@ -1,0 +1,10 @@
+{
+    "host-your-own-bot": {
+        "version": "1.0.0",
+        "releaseTitle": "Initial Release"
+    },
+    "fivem-script": {
+        "version": "1.0.0",
+        "releaseTitle": "Initial Release"
+    }
+}
