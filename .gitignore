@@ -5,3 +5,5 @@ config/config.json
 script/config.js
 .luacheckrc
 Host-Your-Own-Bot/config/config.json
+server/config.js
+script/config.js
