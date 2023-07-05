@@ -22,7 +22,7 @@ jobs:
         run: rm -r script
 
       - name: Remove Unneeded Files
-        run: rm -rf .gitignore; rm -rf .gitattributes; rm -r .github; rm -r .git; rm -rf CONTRIBUTING.md; rm -rf README.md;
+        run: rm -rf .gitignore; rm -rf .gitattributes; rm -r .github; rm -r .git; rm -rf CONTRIBUTING.md; rm -rf README.md; rm -rf LICENSE;
 
       - name: Upload DutyLogs-Bot Artifact
         uses: actions/upload-artifact@v1
