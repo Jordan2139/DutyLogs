@@ -25,7 +25,7 @@ To run the FiveM Duty Logs Bot, you will need the following:
 
 ## Installation
 
-1. Download the pre-packaged DutyLogs-Script.zip and DutyLogs-Bot.zip files from the [Releases](link-to-releases-page) section.
+1. Download the pre-packaged DutyLogs-Script.zip and DutyLogs-Bot.zip files from the [Releases](https://github.com/Jordan2139/DutyLogs/releases) section.
 2. Extract the contents of the DutyLogs-Script.zip file to your desired location.
 3. Follow the instructions in the DutyLogs-Script/README.md file to set up the script.
 4. Extract the contents of the DutyLogs-Bot.zip file to your desired location.
@@ -50,8 +50,7 @@ For a complete list of commands and usage instructions, please refer to the bot'
 
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute to the FiveM Duty Logs Bot, please follow the guidelines outlined in the [CONTRIBUTING.md]([link-to-contributing-file](https://github.com/Jordan2139/DutyLogs/blob/master/CONTRIBUTING.md)) file.
-
+Contributions are welcome! If you'd like to contribute to the FiveM Duty Logs Bot, please follow the guidelines outlined in the [CONTRIBUTING.md](https://github.com/Jordan2139/DutyLogs/blob/master/CONTRIBUTING.md) file.
 ## License
 
-The FiveM Duty Logs Bot is licensed under the [MIT License](link-to-license-file).
+The FiveM Duty Logs Bot is licensed under the [MIT License](https://github.com/Jordan2139/DutyLogs/blob/master/LICENSE).
