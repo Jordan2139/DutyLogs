@@ -92,9 +92,6 @@ jobs:
           cd ./Host-Your-Own-Bot
           rm -rf RUNME.bat
           rm -rf INSTALLME.sql
-          cd ../
-          rm -rf version.json
-          rm -r artifacts
           
       - name: SFTP Upload
         uses: Lauweal/sftp-deploy-action@v1.0.4
