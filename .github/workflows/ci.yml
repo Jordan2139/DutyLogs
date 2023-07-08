@@ -100,7 +100,7 @@ jobs:
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
-          local: ./Host-Your-Own-Bot/*
+          local: /Host-Your-Own-Bot
           remote: /
 
       - name: Restart Server
