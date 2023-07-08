@@ -48,9 +48,7 @@ CREATE TABLE IF NOT EXISTS `servers` (
 
 CREATE TABLE IF NOT EXISTS `sessions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `steam` text COLLATE utf
-
-8mb4_unicode_520_ci,
+  `steam` text COLLATE utf8mb4_unicode_520_ci,
   `server` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=162 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
