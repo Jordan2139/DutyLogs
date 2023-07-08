@@ -92,6 +92,10 @@ jobs:
           cd ./Host-Your-Own-Bot
           rm -rf RUNME.bat
           rm -rf INSTALLME.sql
+          cd ../
+          rm -rf version.json
+          rm -r artifacts
+          
       - name: SFTP Upload
         uses: Lauweal/sftp-deploy-action@v1.0.4
         with:
@@ -99,7 +103,7 @@ jobs:
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
-          local_path: ./Host-Your-Own-Bot
+          local_path: ./Host-Your-Own-Bot/*
           remote_path: /
 
       - name: Restart Server
