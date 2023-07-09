@@ -261,7 +261,7 @@ module.exports = function (client) {
         const discordId = req.query.discordID;
         client.db.query(`SELECT * FROM servers WHERE guild = ?;`, [serverIp], async function (err, res) {
             if (err) return console.log(err);
-            if (!res?.length) return console.log(`No server found with IP: ${serverIp}`);
+            if (!res?.length) return console.log(`No server found with IP: ${serverIp}`) && res.send({ roles: [] })
             const server = res[0];
             client.db.query(`SELECT * FROM discordroles WHERE guild = ?;`, [server.guild], async function (err, res) {
                 if (err) return console.log(err);
