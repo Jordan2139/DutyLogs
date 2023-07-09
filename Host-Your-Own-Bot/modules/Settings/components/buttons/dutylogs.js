@@ -51,14 +51,14 @@ module.exports.run = function (client, interaction, data) {
                         const departmentName = department.name;
                         const allowedRoles = department.allowedRoles;
                         if (allowedRoles && allowedRoles.length > 0 && userRoles.some(role => allowedRoles.includes(role))) {
-                            if (count < 5) {
+                            if (count < 5 && !count > 6) {
                                 departmentButtonRow.addComponent(
                                     new Button()
                                         .setLabel(departmentName)
                                         .setStyle(3)
                                         .setCustomId(`dutylogsetup-setup-${departmentKey}`)
                                 );
-                            } else if (count >= 5) {
+                            } else if (count > 5 && count < 10) {
                                 departmentButtonRow2.addComponent(
                                     new Button()
                                         .setLabel(departmentName)
