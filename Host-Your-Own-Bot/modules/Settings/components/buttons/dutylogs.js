@@ -45,7 +45,7 @@ module.exports.run = function (client, interaction, data) {
                         count++;
                     }
                 } else {
-                    let count = 0;
+                    let count = 1;
                     for (const departmentKey in client.config.departments) {
                         const department = client.config.departments[departmentKey];
                         const departmentName = department.name;
