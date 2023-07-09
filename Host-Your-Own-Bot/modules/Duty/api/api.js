@@ -44,7 +44,7 @@ module.exports = function (client) {
         cookie: { maxAge: 253402300000000 },
     }));
     app.use(cookieParser());
-    const server = app.listen(config.api.port, config.api.listenAddress, function () {
+    const server = app.listen(config.api.port, function () {
         const { address, port } = server.address();
         console.log(chalk.bold.green("[ SUCCESS ]") + `: API Online under address: http://${address}:${port}`);
     });
@@ -243,6 +243,46 @@ module.exports = function (client) {
         }
     })
 }
+
+/**
+ * @description This is the handling for the / endpoint
+ * @description This endpoint is used to check if the API is online
+ */
+app.get('/', function (req, res) {
+    res.send('API Online')
+});
+
+/**
+ * @description This is the handling for the /getdiscordroles endpoint
+ * @description This endpoint is used to get the discord roles for a user
+ * @description This endpoint requires the following query parameters:
+ * @description discordID: The discord ID of the user
+ */
+app.get('/getdiscordroles', function (req, res) {
+    const serverIp = req.ip
+    const discordId = req.query.discordID;
+    client.db.query(`SELECT * FROM servers WHERE guild = ?;`, [serverIp], async function (err, res) {
+        if (err) return console.log(err);
+        if (!res?.length) return console.log(`No server found with IP: ${serverIp}`);
+        const server = res[0];
+        client.db.query(`SELECT * FROM discordroles WHERE guild = ?;`, [server.guild], async function (err, res) {
+            if (err) return console.log(err);
+            if (!res?.length) return console.log(`No discord roles found for ${server.guild}`);
+            const roles = res;
+            let roleArray = [];
+            for (let role of roles) {
+                roleArray.push(role.roleid);
+            }
+            const guild = client.guilds.cache.get(server.guild);
+            const member = guild.members.cache.get(discordId);
+            let memberRoles = [];
+            for (let role of member.roles.cache) {
+                memberRoles.push(role[0]);
+            }
+            res.send({ roles: roleArray });
+        });
+    });
+});
 
 
 /**

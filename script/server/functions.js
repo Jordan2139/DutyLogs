@@ -54,15 +54,12 @@ on('OndutyLogs::OnDuty', async (department) => {
                 if (discordID) {
                     let permissionCheckRes = await axios({
                         method: 'get',
-                        url: `http://${config.api.dutylogsbotip}:${config.api.dutylogsbotport}/getdiscordroles`,
+                        url: `http://${config.api.dutylogsbotip}:${config.api.dutylogsbotport}/getdiscordroles?discordID=${discordID}`,
                         headers: {
                             Accept: 'application/json, text/plain, */*',
                             'User-Agent': '*',
                             'authorization': config.api.secretkey,
                         },
-                        params: {
-                            discordID: discordID
-                        }
                     }).catch((error) => {
                         if (error.code === 'ECONNABORTED' || error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
                             logError('Connection to DutyLogs API timed out.')
