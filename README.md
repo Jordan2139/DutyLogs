@@ -9,6 +9,9 @@ A Discord bot built with Discord.js for managing duty logs and tracking personne
 
 The FiveM Duty Logs Bot is a Discord bot designed to facilitate the management of duty logs and track personnel activity in your FiveM server. It provides a range of commands and features to streamline the logging process and generate reports.
 
+## Demo Discord
+[Join Here](https://discord.gg/5dgD3FdVnr)
+
 ## Features
 
 - Log and track duty status of server personnel
