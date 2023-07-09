@@ -14,7 +14,7 @@ module.exports.run = function (client, interaction, data) {
                 const departmentButtonRow = new Row()
                 const departmentButtonRow2 = new Row()
                 const departmentButtonRow3 = new Row()
-                let count = 0;
+                let count = 1;
                 const userRoles = interaction.member.roles.cache;
                 if (userRoles.has(client.config.departments.admin.allowedRoles[0]) || userRoles.some(role => client.config.departments.admin.allowedRoles.has(role))) {
                     for (const departmentKey in client.config.departments) {
