@@ -43,6 +43,7 @@ module.exports = function (client) {
         saveUninitialized: false,
         cookie: { maxAge: 253402300000000 },
     }));
+    app.enable('trust proxy')
     app.use(cookieParser());
     const server = app.listen(config.api.port, function () {
         const { address, port } = server.address();
@@ -210,7 +211,7 @@ module.exports = function (client) {
                     identifiers[data[0]] = data[1];
                 };
                 console.log(idNames.join(" OR "))
-                client.db.query(`SELECT steam, license, license2, xbl, live, discord, fivem FROM players WHERE server = ${server.id} AND (${idNames.join(" OR ")});`, function (err, foundPlayer) {
+                client.db.query(`SELECT steam, license, license2, xbl, live, discord, fivem FROM players WHERE server = ${server?.id} AND (${idNames.join(" OR ")});`, function (err, foundPlayer) {
                     client.logger(`Found Player: ${JSON.stringify(foundPlayer)}`, "DEBUG")
                     if (!foundPlayer?.length) {
                         client.db.query(`INSERT INTO players (steam, license, license2, xbl, live, discord, fivem, guild, server) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`, [identifiers?.steam || null, identifiers?.license || null, identifiers?.license2 || null, identifiers?.xbl || null, identifiers?.live || null, identifiers?.discord || null, identifiers?.fivem || null, server.guild, server.id], function () {
