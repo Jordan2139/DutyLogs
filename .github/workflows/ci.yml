@@ -114,4 +114,4 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
           local: /script
-          remote: /resources/[DEMO]/
+          remote: /resources/[DEMO]/ondutylogs
