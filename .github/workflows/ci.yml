@@ -90,7 +90,6 @@ jobs:
       - name: Prepare SFTP Upload
         run: |
           cd ./Host-Your-Own-Bot
-          rm -rf RUNME.bat
           rm -rf INSTALLME.sql
           
       - name: SFTP Upload
