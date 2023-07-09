@@ -41,7 +41,7 @@ RegisterCommand('duty', (_, args) => {
      } else if (!onduty) {
           emitNet('OndutyLogs::OnDuty', args[0])
      } else if (onduty && department.abbr.toUpperCase() !== args[0].toUpperCase()) {
-          emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^1[ERROR] ^7You are already on duty as ${department}, you must go off duty as that first, then you may go on duty as ${args[0]}.`] })
+          emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^1[ERROR] ^7You are already on duty as ${department.name}, you must go off duty as that first, then you may go on duty as ${args[0]}.`] })
      }
 })
 
@@ -98,7 +98,7 @@ onNet('OndutyLogs::Callback', (status, error) => {
                onduty = true;
                department = status.department;
           } else {
-               emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7You are now off duty as ${status.department.name}.\n ${status.department.blips.enabled ? 'Your ' + status.department.blips.type + ' have been disabled' : ''}`] })
+               emit('chat:addMessage', { color: [255, 0, 0], multiline: true, args: ['[SSRP Duty Logs] ', `^2[SUCCESS] ^7You are now off duty as ${status.department.name}.\n ${status.department.blips.enabled ? 'Your ' + status.department.blips.type + ' blips have been disabled' : ''}`] })
                onduty = false;
                department = null;
           }
