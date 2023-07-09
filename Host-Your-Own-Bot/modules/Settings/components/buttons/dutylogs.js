@@ -20,14 +20,17 @@ module.exports.run = function (client, interaction, data) {
                     for (const departmentKey in client.config.departments) {
                         const department = client.config.departments[departmentKey];
                         const departmentName = department.name;
-                        if (count < 5 && !count > 6) {
+                        console.log(departmentName)
+                        if (count <= 5 ) {
+                            console.log('1')
                             departmentButtonRow.addComponent(
                                 new Button()
                                     .setLabel(departmentName)
                                     .setStyle(3)
                                     .setCustomId(`dutylogsetup-setup-${departmentKey}`)
                             );
-                        } else if (count > 5 && count < 10) {
+                        } else if (count >= 6 && count < 10) {
+                            console.log('2')
                             departmentButtonRow2.addComponent(
                                 new Button()
                                     .setLabel(departmentName)
@@ -51,14 +54,14 @@ module.exports.run = function (client, interaction, data) {
                         const departmentName = department.name;
                         const allowedRoles = department.allowedRoles;
                         if (allowedRoles && allowedRoles.length > 0 && userRoles.some(role => allowedRoles.includes(role))) {
-                            if (count < 5 && !count > 6) {
+                            if (count <= 5 ) {
                                 departmentButtonRow.addComponent(
                                     new Button()
                                         .setLabel(departmentName)
                                         .setStyle(3)
                                         .setCustomId(`dutylogsetup-setup-${departmentKey}`)
                                 );
-                            } else if (count > 5 && count < 10) {
+                            } else if (count >= 6 && count < 10) {
                                 departmentButtonRow2.addComponent(
                                     new Button()
                                         .setLabel(departmentName)
@@ -77,11 +80,11 @@ module.exports.run = function (client, interaction, data) {
                         }
                     }
                 }
-                interaction.update({
-                    content: "Lets first start with which department you would like to configure logs for!\nYou have access to the below departments:", components: [
-                        departmentButtonRow, departmentButtonRow2, departmentButtonRow3
-                    ]
-                });
+                let componentsToAdd = [];
+                if (departmentButtonRow.data.components.length > 0) componentsToAdd.push(departmentButtonRow);
+                if (departmentButtonRow2.data.components.length > 0) componentsToAdd.push(departmentButtonRow2);
+                if (departmentButtonRow3.data.components.length > 0) componentsToAdd.push(departmentButtonRow3);
+                interaction.update({ components: componentsToAdd });
                 break;
             case "submit":
                 client.db.query(`INSERT INTO logchannels (guild, channelid, type) VALUES (?, ?, ?);`, [interaction.guild.id, client.cache[interaction.member.id].channel, client.cache[interaction.member.id].type], function (err, res) {
