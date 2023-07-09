@@ -106,6 +106,9 @@ jobs:
         run: |
           curl "https://panel.jordan2139.me/api/client/servers/${{ secrets.API_SERVER_ID }}/power" -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" -X POST -b "pterodactyl_session=${{ secrets.PANEL_SESSION_TOKEN }}" -d '{"signal": "restart"}'
           
+      - name: test
+        run: ls
+        
       - name: SFTP Upload Script
         uses: Lauweal/sftp-deploy-action@v1.0.4
         with:
