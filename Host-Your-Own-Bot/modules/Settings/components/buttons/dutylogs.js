@@ -20,9 +20,7 @@ module.exports.run = function (client, interaction, data) {
                     for (const departmentKey in client.config.departments) {
                         const department = client.config.departments[departmentKey];
                         const departmentName = department.name;
-                        console.log(departmentName)
                         if (count <= 5 ) {
-                            console.log('1')
                             departmentButtonRow.addComponent(
                                 new Button()
                                     .setLabel(departmentName)
@@ -30,7 +28,6 @@ module.exports.run = function (client, interaction, data) {
                                     .setCustomId(`dutylogsetup-setup-${departmentKey}`)
                             );
                         } else if (count >= 6 && count < 10) {
-                            console.log('2')
                             departmentButtonRow2.addComponent(
                                 new Button()
                                     .setLabel(departmentName)
