@@ -20,14 +20,14 @@ module.exports.run = function (client, interaction, data) {
                     for (const departmentKey in client.config.departments) {
                         const department = client.config.departments[departmentKey];
                         const departmentName = department.name;
-                        if (count < 5 && !count >= 5) {
+                        if (count < 5 && !count > 6) {
                             departmentButtonRow.addComponent(
                                 new Button()
                                     .setLabel(departmentName)
                                     .setStyle(3)
                                     .setCustomId(`dutylogsetup-setup-${departmentKey}`)
                             );
-                        } else if (count >= 5 && count < 10) {
+                        } else if (count > 5 && count < 10) {
                             departmentButtonRow2.addComponent(
                                 new Button()
                                     .setLabel(departmentName)
