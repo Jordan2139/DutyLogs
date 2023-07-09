@@ -67,7 +67,7 @@ module.exports = function (client) {
         * This endpoint also sends a message to the duty logs channel
     */
     app.post(`/onduty`, function (req, res) {
-        const serverIp = req.ip
+        const serverIp = convertIPv6ToIPv4(req.ip)
         const player = req.query.player
         const steam = req.query.steam
         const discordID = req.query.discord
@@ -140,7 +140,7 @@ module.exports = function (client) {
     */
 
     app.post(`/offduty`, function (req, res) {
-        const serverIp = req.ip
+        const serverIp = convertIPv6ToIPv4(req.ip)
         const player = req.query.player
         const steam = req.query.steam
         const discordID = req.query.discord
@@ -192,7 +192,7 @@ module.exports = function (client) {
         * This endpoint also logs the request to the database
     */
     app.post('/playerconnect', function (req, res) {
-        const serverIp = req.ip
+        const serverIp = convertIPv6ToIPv4(req.ip)
         const player = JSON.parse(req.query.player)
         client.logger(`${JSON.stringify(player)} connected to ${serverIp}`, "DEBUG")
         if (req.headers.authorization !== config.api.secretkey) {
@@ -258,7 +258,7 @@ module.exports = function (client) {
      * @description discordID: The discord ID of the user
      */
     app.get('/getdiscordroles', function (req, res) {
-        const serverIp = req.ip
+        const serverIp = convertIPv6ToIPv4(req.ip)
         const discordId = req.query.discordID;
         client.db.query(`SELECT * FROM servers WHERE guild = ?;`, [serverIp], async function (err, res) {
             if (err) return console.log(err);
@@ -321,4 +321,20 @@ function compareObjs(object) {
         };
     };
     return false;
+}
+
+/**
+ * @param {string} ipv6Address
+ * @returns {string}
+ * @description Converts an IPv6 address to an IPv4 address
+ * @example convertIPv6ToIPv4('::ffff:124.563.23.1') // 124.563.23.1
+*/
+function convertIPv6ToIPv4(ipv6Address) {
+    const ipv6MappedRegex = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/;
+    const match = ipv6Address.match(ipv6MappedRegex);
+    if (match) {
+        const ipv4Address = match[1];
+        return ipv4Address;
+    }
+    return ipv6Address;
 }
