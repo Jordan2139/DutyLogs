@@ -13,7 +13,7 @@ module.exports.run = async function(client, interaction, data) {
             }).catch(function(err) {});
             if (!server?.data) return;
             let name = interaction.fields.get("name")?.value || server.data.vars.sv_projectName;
-            client.db.query(`INSERT INTO servers (ip, port, guild, addedBy, name, maxPlayers) VALUES (?, ?, ?, ?, ?, ?);`, [ip, port, interaction.guild.id, `${interaction.user.tag}`, name, server.data.vars.sv_maxClients], function(err, res) {
+            client.db.query(`INSERT INTO servers (ip, port, guild, addedBy, name) VALUES (?, ?, ?, ?, ?);`, [ip, port, interaction.guild.id, `${interaction.user.tag}`, name], function(err, res) {
                 client.db.query(`SELECT * FROM servers WHERE guild = ?;`, [interaction.guild.id], async function(err, servers) {
                     let description = "";
                     let menu = new Menu()
@@ -23,16 +23,12 @@ module.exports.run = async function(client, interaction, data) {
                         .setCustomId(`servers-edit`)
                     let data = [];
                     for (let server of servers) {
-                        let voice = interaction.guild.channels.cache.get(server.displayVoice);
-                        let text = interaction.guild.channels.cache.get(server.displayText);
                         let name = server.name == null ? "N/A" : server.name.length <= 8 ? server.name : server.name.slice(0, 8) + "...";
                         data.push(
                             {
                                 ID: server.id,
                                 "Hostname / IP": server.ip,
                                 Port: server.port,
-                                Voice: voice?.name || "N/A",
-                                Text: text?.name || "N/A",
                                 Name: name
                             }
                         );
