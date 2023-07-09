@@ -82,7 +82,7 @@ module.exports = function (client) {
             if (status) {
                 client.db.query(`SELECT * FROM servers WHERE ip = ?;`, [serverIp], async function (err, res) {
                     if (err) return console.log(err);
-                    if (!res?.length) return console.log(`No server found with IP: ${serverIp}`);
+                    if (!res?.length) return console.log(`No server found with IP: ${serverIp}`) && res.send(`No server found with IP: ${serverIp}`)
                     const server = res[0];
                     client.db.query(`SELECT * FROM logchannels WHERE guild = ? AND type = ?;`, [server.guild, department.toUpperCase()], async function (err, res) {
                         if (err) return console.log(err);
@@ -154,8 +154,7 @@ module.exports = function (client) {
             console.log(`Request Received`)
             if (status) {
                 client.db.query(`SELECT * FROM servers WHERE ip = ?;`, [serverIp], async function (err, res) {
-                    if (err) return console.log(err);
-                    if (!res?.length) return console.log(`No server found with IP: ${serverIp}`);
+                    if (!res?.length) return console.log(`No server found with IP: ${serverIp}`) && res.send(`No server found with IP: ${serverIp}`)
                     const server = res[0];
                     client.db.query(`SELECT * FROM logchannels WHERE guild = ? AND type = ?;`, [server.guild, department.toUpperCase()], async function (err, res2) {
                         if (err) return console.log(err);
@@ -202,6 +201,7 @@ module.exports = function (client) {
             res.send(`Request Received`)
             console.log(`Request Received`)
             client.db.query(`SELECT * FROM servers WHERE ip = ?;`, [serverIp], async function (err, serverres) {
+                if (!serverres?.length) return console.log(`No server found with IP: ${serverIp}`) && res.send(`No server found with IP: ${serverIp}`)
                 let server = serverres[0];
                 let identifiers = {};
                 let idNames = [];
