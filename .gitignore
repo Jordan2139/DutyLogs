@@ -2,7 +2,6 @@ node_modules
 package-lock.json
 config/config.json
 .wakatime-project
-script/config.js
 .luacheckrc
 Host-Your-Own-Bot/config/config.json
 server/config.js
