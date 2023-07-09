@@ -87,12 +87,12 @@ jobs:
           asset_name: DutyLogs-Bot.zip
           asset_content_type: application/zip
 
-      - name: Prepare SFTP Upload
+      - name: Prepare SFTP Upload Bot
         run: |
           cd ./Host-Your-Own-Bot
           rm -rf INSTALLME.sql
           
-      - name: SFTP Upload
+      - name: SFTP Upload Bot
         uses: Lauweal/sftp-deploy-action@v1.0.4
         with:
           host: ${{ secrets.SFTP_HOST }}
@@ -105,3 +105,13 @@ jobs:
       - name: Restart Server
         run: |
           curl "https://panel.jordan2139.me/api/client/servers/${{ secrets.API_SERVER_ID }}/power" -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" -X POST -b "pterodactyl_session=${{ secrets.PANEL_SESSION_TOKEN }}" -d '{"signal": "restart"}'
+          
+      - name: SFTP Upload Script
+        uses: Lauweal/sftp-deploy-action@v1.0.4
+        with:
+          host: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME_SCRIPT }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: ${{ secrets.SFTP_PORT }}
+          local: /script
+          remote: /resources/[DEMO]/
